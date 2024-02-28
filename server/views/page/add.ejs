@@ -1,0 +1,123 @@
+<%- include ../partials/header.ejs %>
+<%- include ../partials/main_nav.ejs %>
+
+<div class="container">
+    <h1>Create a Survey</h1>
+    <form method="POST">
+        <div>
+            <label for="surveyTitle">Survey Title</label>
+            <input type="text" id="surveyTitle" placeholder="Enter Survey Title" name="title" required>
+        </div>
+
+        <div>
+            <label for="description">Survey Description</label>
+            <textarea cols="50" id="description" placeholder="Enter Survey Description" name="description" required></textarea>
+        </div>
+
+        <div>
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" name="startTime" required>
+        </div>
+
+        <div>
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate" name="endTime" required>
+        </div>
+
+        <div class="question-fields">
+            <label for="questionType">Question Type</label>
+            <select name="questionType" id="questionType">
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="short_answers">Short Answers</option>
+            </select>
+        </div>
+
+        <div id="questionFields">
+            <!-- Question fields will be dynamically generated here -->
+        </div>
+
+        <button type="submit">Submit</button>
+
+        <a href="/survey-list" class="btn btn-warning">
+            <i class="fas fa-undo"></i> Cancel
+        </a>
+    </form>
+</div>
+
+<%- include ../partials/footer.ejs %>
+
+<script>
+    const questionTypeSelect = document.getElementById('questionType');
+    const questionFieldsContainer = document.getElementById('questionFields');
+
+    function generateMultipleChoiceQuestionField(questionNumber) {
+        const questionField = `
+            <div id="question${questionNumber}" class="questionField">
+                <label for="question${questionNumber}Text">Question ${questionNumber}</label>
+                <input type="text" id="question${questionNumber}Text" name="questions[]" required>
+                <div class="choicesContainer">
+                    <input type="text" class="choiceText" name="choices[]" required>
+                    <button type="button" class="removeChoice">Remove</button>
+                </div>
+                <div class="choicesContainer">
+                    <input type="text" class="choiceText" name="choices[]" required>
+                    <button type="button" class="removeChoice">Remove</button>
+                </div>
+                
+                <button type="button" class="addChoice">Add Choice</button>
+            </div>
+        `;
+        questionFieldsContainer.insertAdjacentHTML('beforeend', questionField);
+    }
+
+    function generateShortAnswerQuestionField() {
+        const questionField = `
+            <div class="questionField">
+                <label for="shortAnswerText">Short Answer</label>
+                <textarea id="shortAnswerText" name="questions[]" required></textarea>
+            </div>
+        `;
+        questionFieldsContainer.insertAdjacentHTML('beforeend', questionField);
+    }
+
+    function generateQuestionFields() {
+        questionFieldsContainer.innerHTML = '';
+        const selectedType = questionTypeSelect.value;
+        if (selectedType === 'multiple_choice') {
+            generateMultipleChoiceQuestionField(1);
+        } else if (selectedType === 'short_answers') {
+            generateShortAnswerQuestionField();
+        }
+    }
+
+    questionTypeSelect.addEventListener('change', generateQuestionFields);
+    generateQuestionFields();
+
+    // Add event listener for "Add Choice" buttons
+    questionFieldsContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('addChoice')) {
+            const questionField = event.target.closest('.questionField');
+            const choicesContainer = questionField.querySelectorAll('.choicesContainer');
+
+            const newChoiceContainer = document.createElement('div');
+            newChoiceContainer.classList.add('choicesContainer');
+            newChoiceContainer.innerHTML = `
+                <input type="text" class="choiceText" name="choices[]" required>
+                <button type="button" class="removeChoice">Remove</button>
+            `;
+            questionField.insertBefore(newChoiceContainer, event.target);
+        }
+    });
+
+    // Add event listener for "Remove" buttons for choices
+    questionFieldsContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('removeChoice')) {
+            const choicesContainer = event.target.parentNode;
+            if (choicesContainer.parentNode.querySelectorAll('.choicesContainer').length > 2) {
+                choicesContainer.parentNode.removeChild(choicesContainer);
+            } else {
+                alert("At least two choices required.");
+            }
+        }
+    });
+</script>
