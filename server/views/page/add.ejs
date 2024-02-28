@@ -70,7 +70,7 @@
             } else if (questionType === 'short_answers') {
                 questionField = `
                     <div class="questionField" data-question-type="${questionType}">
-                        <label for="shortAnswer${questionNumber}Text">Short Answer Question ${questionNumber}</label>
+                        <label for="shortAnswer${questionNumber}Text">Question ${questionNumber}</label>
                         <br>
                         <textarea id="shortAnswer${questionNumber}Text" name="questions[]" required></textarea>
                         <button type="button" class="deleteQuestion">Delete Question</button>
@@ -104,7 +104,7 @@
             }
         });
 
-    questionFieldsContainer.appendChild(questionFieldWrapper);
+        questionFieldsContainer.appendChild(questionFieldWrapper);
         }
 
         // Add event listener for "Add Question" button
