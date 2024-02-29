@@ -8,7 +8,7 @@
 <body>
     <div class="container">
         <h1>Create a Survey</h1>
-        <form method="POST">
+        <form id="surveyForm" method="POST">
             <div>
                 <label for="surveyTitle">Survey Title</label>
                 <input type="text" id="surveyTitle" placeholder="Enter Survey Title" name="title" required>
@@ -36,9 +36,6 @@
             <br>
             <button type="submit">Submit</button>
 
-            <a href="/survey-list" class="btn btn-warning">
-                <i class="fas fa-undo"></i> Cancel
-            </a>
         </form>
     </div>
 
@@ -101,10 +98,10 @@
                     const questionNumber = questionFieldsContainer.querySelectorAll('.questionField').length + 1;
                     generateQuestionField(selectedType, questionNumber);
                     questionTypeSelect.style.display = 'none'; // Hide the type select after choosing a type
-            }
-        });
+                }
+            });
 
-        questionFieldsContainer.appendChild(questionFieldWrapper);
+            questionFieldsContainer.appendChild(questionFieldWrapper);
         }
 
         // Add event listener for "Add Question" button
@@ -147,6 +144,60 @@
                 }
             }
         });
+
+        // 修改表单提交事件处理函数
+        document.getElementById('surveyForm').addEventListener('submit', function(event) {
+            // 收集调查信息
+            const surveyData = collectSurveyData();
+
+            // 将调查数据转换为隐藏字段，添加到表单中
+            const surveyDataField = document.createElement('input');
+            surveyDataField.type = 'hidden';
+            surveyDataField.name = 'surveyData'; // 这里是后端接收数据的字段名称
+            surveyDataField.value = JSON.stringify(surveyData);
+
+            // 将隐藏字段添加到表单中
+            this.appendChild(surveyDataField);
+        });
+
+        // 收集调查数据的函数
+        function collectSurveyData() {
+            const surveyData = {
+                questions: []
+            };
+
+            // 遍历每个问题字段，收集问题信息
+            const questionFields = document.querySelectorAll('.questionField');
+            questionFields.forEach((questionField, index) => {
+                const questionType = questionField.getAttribute('data-question-type');
+                let questionText;
+
+                if (questionType === 'multiple_choice') {
+                    questionText = questionField.querySelector('input[type="text"]').value;
+                }
+
+                // 构建问题对象
+                const question = {
+                    'question type': questionType,
+                    'question text': questionText,
+                    'question choice': []
+                };
+
+                if (questionType === 'multiple_choice') {
+                    const choiceInputs = questionField.querySelectorAll('.choiceText');
+                    choiceInputs.forEach(choiceInput => {
+                        const choiceText = choiceInput.value;
+                        question['question choice'].push(choiceText);
+                    });
+                }
+
+                // 将问题对象添加到数组中
+                surveyData.questions.push(question);
+            });
+
+            // 返回调查数据对象
+            return surveyData;
+        }
     </script>
 </body>
 </html>
