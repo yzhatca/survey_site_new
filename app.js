@@ -23,7 +23,7 @@ app.use(express.json()); // 解析 JSON 格式的请求体
 app.use(express.urlencoded({ extended: false })); // 解析 URL 编码的请求体
 app.use(cookieParser()); // 使用 Cookie 解析中间件
 app.use(express.static(path.join(__dirname, 'public'))); // 设置静态文件目录为当前目录下的 public 文件夹
-
+app.use('/server', express.static('server'));
 app.use(bodyParser.urlencoded({ extended: true }));
 // 使用各个路由模块
 app.use('/', indexRouter); // 使用主页路由

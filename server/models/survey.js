@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
-    type: { type: String, enum: ['multiple_choice', 'text'], required: true }, // 题目类型：单选、文字回答
-    questionText: { type: String, required: true }, // 题目内容
+    qType: { type: String, enum: ['multiple_choice', 'short_answers'], required: true }, // 题目类型：单选、文字回答
+    qText: { type: String, required: true }, // 题目内容
     options: [{ type: String }] // 选项（仅适用于单选题）
 });
 
