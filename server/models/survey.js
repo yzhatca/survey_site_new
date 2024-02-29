@@ -8,7 +8,7 @@ const questionSchema = new Schema({
 });
 
 const answerSchema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // 用户ID
+    // userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // 用户ID
     surveyId: { type: Schema.Types.ObjectId, ref: 'Survey', required: true }, // 调查问卷ID
     responses: [{
         questionId: { type: Schema.Types.ObjectId, ref: 'Question', required: true }, // 问题ID

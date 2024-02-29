@@ -1,0 +1,29 @@
+<%- include ../partials/header.ejs %>
+
+<%- include ../partials/main_nav.ejs %>
+<div>
+    <h1><%= survey.title %></h1>
+    <!-- 提交到默认路由 -->
+    <form method="post">
+        <% const questions = survey.questions %>
+        <% let questionNum = 1 %>
+        <% for (let item of questions) { %>
+            <div>
+                <br>
+                <div>Question <%= questionNum++ %>:</div>
+                <div><%= item.qText %></div>
+                <% if (item.qType === 'short_answers') { %>
+                    <input type="text" name="<%= item._id %>" placeholder="Your answer">
+                <% } else if (item.qType === 'multiple_choice') { %>
+                    <% for(let option of item.options) { %>
+                        <input type="radio" id="<%= option %>" name="<%= item._id %>" value="<%= option %>">
+                        <label for="<%= option %>"><%= option %></label><br>
+                    <% } %>
+                <% } %>
+            </div>
+        <% } %>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<%- include ../partials/footer.ejs %>
