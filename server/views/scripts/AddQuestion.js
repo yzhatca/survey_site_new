@@ -1,4 +1,3 @@
-//javaScript
 const questionFieldsContainer = document.getElementById('questionFields');
 const addQuestionButton = document.getElementById('addQuestion');
 
@@ -8,7 +7,7 @@ function generateQuestionField(questionType, questionNumber) {
         questionField = `
             <div class="questionField" data-question-type="${questionType}">
                 <label for="question${questionNumber}Text">Question ${questionNumber}</label>
-                <input type="text" id="question${questionNumber}Text" " required>
+                <input type="text" id="question${questionNumber}Text" required>
                 <div class="choicesContainer">
                     <input type="text" class="choiceText" required>
                     <button type="button" class="removeChoice">Remove</button>
@@ -27,7 +26,7 @@ function generateQuestionField(questionType, questionNumber) {
             <div class="questionField" data-question-type="${questionType}">
                 <label for="shortAnswer${questionNumber}Text">Question ${questionNumber}</label>
                 <br>
-                <textarea id="shortAnswer${questionNumber}Text"required></textarea>
+                <textarea id="shortAnswer${questionNumber}Text" required></textarea>
                 <button type="button" class="deleteQuestion">Delete Question</button>
             </div>
         `;
@@ -36,30 +35,15 @@ function generateQuestionField(questionType, questionNumber) {
 }
 
 function addQuestion() {
-    const questionFieldWrapper = document.createElement('div');
-    questionFieldWrapper.classList.add('questionFieldWrapper');
-
-    const questionTypeSelect = document.createElement('select');
-    questionTypeSelect.name = 'questionType';
-    questionTypeSelect.classList.add('questionTypeSelect');
-    questionTypeSelect.innerHTML = `
-        <option value="">Select Question Type</option>
-        <option value="multiple_choice">Multiple Choice</option>
-        <option value="short_answers">Short Answers</option>
-    `;
-
-    questionFieldWrapper.appendChild(questionTypeSelect);
-
-    questionTypeSelect.addEventListener('change', function () {
-        const selectedType = this.value;
-        if (selectedType) {
-            const questionNumber = questionFieldsContainer.querySelectorAll('.questionField').length + 1;
-            generateQuestionField(selectedType, questionNumber);
-            questionTypeSelect.style.display = 'none'; // Hide the type select after choosing a type
-        }
-    });
-
-    questionFieldsContainer.appendChild(questionFieldWrapper);
+    const questionTypeSelect = document.getElementById('questionType');
+    const selectedType = questionTypeSelect.value;
+    if (selectedType) {
+        const questionNumber = questionFieldsContainer.querySelectorAll('.questionField').length + 1;
+        generateQuestionField(selectedType, questionNumber);
+        questionTypeSelect.disabled = true; // Disable the type select after choosing a type
+    } else {
+        alert("Please select a question type.");
+    }
 }
 
 // Add event listener for "Add Question" button
@@ -102,26 +86,27 @@ questionFieldsContainer.addEventListener('click', function (event) {
         }
     }
 });
-// 修改表单提交事件处理函数
+
+// Modify form submit event handler
 document.getElementById('surveyForm').addEventListener('submit', function (event) {
-    // 收集调查信息中的问题数组
+    // Collect questions from the survey information
     const questions = collectQuestions();
 
-    // 将问题数组转换为隐藏字段，添加到表单中
+    // Convert questions array to a hidden field and add it to the form
     const questionsField = document.createElement('input');
     questionsField.type = 'hidden';
-    questionsField.name = 'questions'; // 这里是后端接收数据的字段名称
+    questionsField.name = 'questions'; // This is the field name the backend will receive
     questionsField.value = JSON.stringify(questions);
 
-    // 将隐藏字段添加到表单中
+    // Add the hidden field to the form
     this.appendChild(questionsField);
 });
 
-// 收集调查信息中的问题数组的函数
+// Function to collect questions from the survey information
 function collectQuestions() {
     const questions = [];
 
-    // 遍历每个问题字段，收集问题信息
+    // Iterate over each question field and collect question information
     const questionFields = document.querySelectorAll('.questionField');
     questionFields.forEach((questionField, index) => {
         const questionType = questionField.getAttribute('data-question-type');
@@ -133,14 +118,14 @@ function collectQuestions() {
             questionText = questionField.querySelector('textarea').value;
         }
 
-        // 构建问题对象
+        // Build the question object
         const question = {
             'qType': questionType,
             'qText': questionText
         };
 
         if (questionType === 'multiple_choice') {
-            question['options'] = []; // 确保 question 对象中有 'question choice' 属性
+            question['options'] = []; // Ensure the question object has 'options' property
             const choiceInputs = questionField.querySelectorAll('.choiceText');
             choiceInputs.forEach(choiceInput => {
                 const choiceText = choiceInput.value;
@@ -148,10 +133,10 @@ function collectQuestions() {
             });
         }
 
-        // 将问题对象添加到数组中
+        // Add the question object to the array
         questions.push(question);
     });
 
-    // 返回问题数组
+    // Return the questions array
     return questions;
 }

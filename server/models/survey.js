@@ -2,30 +2,31 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
-    qType: { type: String, enum: ['multiple_choice', 'short_answers'], required: true }, // 题目类型：单选、文字回答
-    qText: { type: String, required: true }, // 题目内容
-    options: [{ type: String }] // 选项（仅适用于单选题）
+    qType: { type: String, enum: ['multiple_choice', 'short_answers'], required: true },
+    qText: { type: String, required: true },
+    options: [{ type: String }]
 });
 
 const answerSchema = new Schema({
-    // userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // 用户ID
-    surveyId: { type: Schema.Types.ObjectId, ref: 'Survey', required: true }, // 调查问卷ID
-    responses: [{
-        questionId: { type: Schema.Types.ObjectId, ref: 'Question', required: true }, // 问题ID
-        answer: { type: Schema.Types.Mixed } // 用户的回答，可以是字符串、数组等类型
-    }],
-    createdAt: { type: Date, default: Date.now } // 回答创建时间
+    // userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    questionId: { type: Schema.Types.ObjectId, ref: 'Question', required: true },
+    surveyId: { type: Schema.Types.ObjectId, ref: 'Survey', required: true },
+    answer: { type: Schema.Types.Mixed },
+    createdAt: { type: Date, default: Date.now }
 });
 
 const surveySchema = new Schema({
-    title: { type: String, required: true }, // 调查问卷标题
-    description: { type: String }, // 调查问卷描述
-    questions: [questionSchema], // 题目列表
-    creator: { type: Schema.Types.ObjectId, ref: 'User' }, // 创建人（用户 ID）
-    createTime: { type: Date, default: Date.now }, // 调查问卷创建时间
-    startTime: { type: Date }, // 调查问卷开始时间
-    endTime: { type: Date }, // 调查问卷结束时间
-    answers: [answerSchema] // 存储答案的字段，每个调查问卷可以包含多个答案
+    title: { type: String, required: true },
+    description: { type: String },
+    creator: { type: Schema.Types.ObjectId, ref: 'User' },
+    createTime: { type: Date, default: Date.now },
+    startTime: { type: Date },
+    endTime: { type: Date },
+    questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }] // 关联问题
 });
 
-module.exports = mongoose.model('Survey', surveySchema);
+module.exports = {
+    Question: mongoose.model('Question', questionSchema),
+    Answer: mongoose.model('Answer', answerSchema),
+    Survey: mongoose.model('Survey', surveySchema)
+};

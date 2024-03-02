@@ -32,17 +32,27 @@
                 <input type="date" id="endDate" name="endTime" required>
             </div>
 
+            <div class="question-fields">
+                <label for="questionType">Question Type</label>
+                <select name="questionType" id="questionType">
+                    <option value="">Select Question Type</option>
+                    <option value="multiple_choice">Multiple Choice</option>
+                    <option value="short_answers">Short Answers</option>
+                </select>
+            </div>
+
             <div id="questionFields">
                 <!-- Question fields will be dynamically generated here -->
             </div>
+
             <button type="button" id="addQuestion">Add Question</button>
             <br>
             <button type="submit">Submit</button>
-
         </form>
     </div>
-<script src="/server/views/scripts/AddQuestion.js"></script>
-    
+
+    <script src="/server/views/scripts/AddQuestion.js"></script>
+
 </body>
 
 </html>
