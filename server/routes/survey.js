@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { Survey, Question, Answer } = require("../models/survey");
 
-// 添加调查
+// 添加调查问卷
 router.get("/add", (req, res, next) => {
   // 跳转到 page 中的 addSurvey.ejs 页
   res.render("page/add", { title: "Add Survey" });
@@ -34,16 +34,16 @@ router.post("/add", async (req, res) => {
       return question._id; // 返回问题的 ObjectId
     }));
 
-    // 创建调查对象
+    // 创建调查问卷对象
     const survey = new Survey({
       title,
       description,
       startTime: new Date(startTime),
       endTime: new Date(endTime),
-      questions: questionIds, // 将问题的 ObjectId 数组存储在调查中
+      questions: questionIds, // 将问题的 ObjectId 数组存储在调查问卷中
     });
 
-    // 将调查对象保存到数据库
+    // 将调查问卷对象保存到数据库
     await survey.save();
 
     // 返回成功消息
@@ -60,14 +60,14 @@ router.get("/update/:id", async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    // 使用 populate 方法来获取与调查关联的问题
+    // 使用 populate 方法来获取与调查问卷关联的问题
     // .populate('questions') 是 Mongoose 中的一种方法，用于填充引用字段的关联文档。在这个上下文中，
     // 'questions' 是指 surveySchema 中的字段，它是一个数组，包含了与问题（questions）模式关联的对象ID。
-    // 当你调用 .populate('questions') 时，Mongoose 将会替换调查（Survey）记录中的问题ID（保存在 'questions' 字段中）为对应的问题对象。
-    // 这样，你就可以在调查对象中直接访问问题对象，而不仅仅是它们的ID。
+    // 当你调用 .populate('questions') 时，Mongoose 将会替换调查问卷（Survey）记录中的问题ID（保存在 'questions' 字段中）为对应的问题对象。
+    // 这样，你就可以在调查问卷对象中直接访问问题对象，而不仅仅是它们的ID。
     const survey = await Survey.findById(id).populate('questions').exec();
     if (!survey) {
-      // 如果找不到相应ID的调查
+      // 如果找不到相应ID的调查问卷
       return res.status(404).send("Survey not found");
     }
     
@@ -81,19 +81,19 @@ router.get("/update/:id", async (req, res, next) => {
   }
 });
 
-// 编辑调查
+// 编辑调查问卷
 router.post("/update/:id", async (req, res) => {
   const surveyId = req.params.id;
   const { title, description, startTime, endTime, questions } = req.body;
   console.log(req.body)
   try {
-      // 查找要更新的调查
+      // 查找要更新的调查问卷
       const survey = await Survey.findById(surveyId);
       if (!survey) {
           return res.status(404).json({ error: "Survey not found" });
       }
 
-      // 更新调查信息
+      // 更新调查问卷信息
       survey.title = title;
       survey.description = description;
       survey.startTime = startTime;
@@ -112,10 +112,10 @@ router.post("/update/:id", async (req, res) => {
           return question._id;
       }));
 
-      // 更新调查的问题数组
+      // 更新调查问卷的问题数组
       survey.questions = updatedQuestions;
 
-      // 保存更新后的调查
+      // 保存更新后的调查问卷
       await survey.save();
 
       res.json({ message: "Survey updated successfully" });
@@ -125,13 +125,13 @@ router.post("/update/:id", async (req, res) => {
   }
 });
 
-// 获取调查列表
+// 获取调查问卷列表
 router.get("/list", async (req, res, next) => {
   try {
-    // 从数据库中获取调查列表
+    // 从数据库中获取调查问卷列表
     const surveyList = await Survey.find();
     console.log(surveyList)
-    // 渲染页面并将调查列表传递给模板引擎
+    // 渲染页面并将调查问卷列表传递给模板引擎
     res.render("page/list", {
       title: "Surveys",
       SurveyList:surveyList
@@ -142,19 +142,19 @@ router.get("/list", async (req, res, next) => {
   }
 });
 
-// 获取单个调查
+// 获取单个调查问卷
 router.get("/take/:id", async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    // 使用 populate 方法来获取与调查关联的问题
+    // 使用 populate 方法来获取与调查问卷关联的问题
     // .populate('questions') 是 Mongoose 中的一种方法，用于填充引用字段的关联文档。在这个上下文中，
     // 'questions' 是指 surveySchema 中的字段，它是一个数组，包含了与问题（questions）模式关联的对象ID。
-    // 当你调用 .populate('questions') 时，Mongoose 将会替换调查（Survey）记录中的问题ID（保存在 'questions' 字段中）为对应的问题对象。
-    // 这样，你就可以在调查对象中直接访问问题对象，而不仅仅是它们的ID。
+    // 当你调用 .populate('questions') 时，Mongoose 将会替换调查问卷（Survey）记录中的问题ID（保存在 'questions' 字段中）为对应的问题对象。
+    // 这样，你就可以在调查问卷对象中直接访问问题对象，而不仅仅是它们的ID。
     const survey = await Survey.findById(id).populate('questions').exec();
     if (!survey) {
-      // 如果找不到相应ID的调查
+      // 如果找不到相应ID的调查问卷
       return res.status(404).send("Survey not found");
     }
     
@@ -169,7 +169,7 @@ router.get("/take/:id", async (req, res, next) => {
   }
 });
 
-// 提交调查答案
+// 提交调查问卷答案
 router.post('/take/:id', async (req, res) => {
   try {
       const surveyId = req.params.id;
@@ -186,7 +186,7 @@ router.post('/take/:id', async (req, res) => {
               const answer = responses[questionId];
               const newAnswer = new Answer({
                   questionId, // 使用问题的 ID
-                  surveyId, // 使用调查的 ID
+                  surveyId, // 使用调查问卷的 ID
                   answer,
               });
               newAnswers.push(newAnswer); // 添加新的答案对象到数组中
@@ -202,6 +202,33 @@ router.post('/take/:id', async (req, res) => {
       res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
+
+// 删除调查问卷
+router.get('/delete/:id', async (req, res) => {
+  try {
+    const surveyId = req.params.id;
+
+    // 使用 findByIdAndDelete 方法来删除调查问卷
+    const deletedSurvey = await Survey.findByIdAndDelete(surveyId);
+    
+    if (!deletedSurvey) {
+      // 如果找不到要删除的调查问卷
+      return res.status(404).json({ success: false, message: 'Survey not found' });
+    }
+
+    // 删除与调查问卷相关联的问题
+    await Question.deleteMany({ _id: { $in: deletedSurvey.questions } });
+
+    // 删除与调查问卷相关联的答案
+    await Answer.deleteMany({ surveyId });
+
+    res.status(200).json({ success: true, message: 'Survey deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 
 
 module.exports = router;
