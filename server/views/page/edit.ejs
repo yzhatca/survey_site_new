@@ -3,7 +3,7 @@
 <%- include ../partials/main_nav.ejs %>
 <div class="container">
     <h1>Edit Survey</h1>
-    <form id="surveyForm" method="POST"> <!-- 添加了ID -->
+    <form id="surveyForm" method="POST">
         <div>
             <label for="surveyTitle">Survey Title</label>
             <input type="text" id="surveyTitle" placeholder="Enter Survey Title" name="title" required value="<%= survey.title %>">
@@ -13,7 +13,7 @@
             <label for="description">Survey Description</label>
             <textarea cols="50" id="description" placeholder="Enter Survey Description" name="description" required><%= survey.description %></textarea>
         </div>
-
+        
         <div>
             <label for="startDate">Start Date</label>
             <input type="date" id="startDate" name="startTime" required value="<%= survey.startTime %>">
@@ -23,87 +23,39 @@
             <label for="endDate">End Date</label>
             <input type="date" id="endDate" name="endTime" required value="<%= survey.endTime %>">
         </div>
+            <div class="question-fields" hidden="true">
+                <label for="questionType">Question Type</label>
+                <select name="questionType" id="questionType">
+                    <option value="<%= survey.questions[0].qType %>"><%= survey.questions[0].qType %></option>
+                </select>
+            </div>    
+        <div id="questionFields">
+            <% survey.questions.forEach((question, index) => { %>
+                <div class="questionField" data-question-type="<%= question.qType %>">
 
-        <!-- Iterate over existing questions -->
-        <% survey.questions.forEach((question, index) => { %>
-        <div id="questionFields<%= index %>">
-            <div class="questionField" data-question-type="<%= question.qType %>">
-                <label for="question<%= index %>Text">Question <%= index + 1 %></label>
-                <input type="text" id="question<%= index %>Text" required value="<%= question.qText %>">
-                <input type="hidden"value="<%= question._id %>">
-                <input type="hidden" value="<%= question.qType %>">
-                <% if (question.qType === 'multiple_choice') { %>
-                <% question.options.forEach((option, optIndex) => { %>
-                <div class="choicesContainer">
-                    <input type="text" class="choiceText" required value="<%= option %>">
+                    <label for="question<%= index %>Text">Question <%= index + 1 %></label>
+                    <input type="text" id="question<%= index %>Text" required value="<%= question.qText %>">
+                    <input type="hidden"value="<%= question._id %>">
+                    <input type="hidden" value="<%= question.qType %>">
+                    <% if (question.qType === 'multiple_choice') { %>
+                    <% question.options.forEach((option, optIndex) => { %>
+                    <div class="choicesContainer">
+                        <input type="text" class="choiceText" required value="<%= option %>">
+                        <button type="button" class="removeChoice">Remove</button>
+                    </div>
+                    <% }) %>
+                    <button type="button" class="addChoice">Add Choice</button>
+                    <% } %>
+                    <button type="button" class="deleteQuestion">Delete Question</button>
                 </div>
-                <% }) %>
-                <% } %>
-            </div>
+            <% }) %>
         </div>
-        <% }) %>
         
+        <button type="button" id="addQuestion">Add Question</button>
         <br>
         <button type="submit">Update</button>
     </form>
 </div>
 
 <%- include ../partials/footer.ejs %>
-<script>
-    document.getElementById('surveyForm').addEventListener('submit', function (event) {
-        event.preventDefault(); // 阻止表单默认提交行为
-
-        // Collect questions from the survey information
-        const questions = collectQuestions();
-
-        // Add questions data to the form as a hidden input
-        const questionsInput = document.createElement('input');
-        questionsInput.type = 'hidden';
-        questionsInput.name = 'questions'; // 将问题数组作为一个整体传递给后端
-        questionsInput.value = JSON.stringify(questions);
-        this.appendChild(questionsInput);
-
-        // Form will submit normally with questions data included
-        this.submit(); // 手动提交表单
-    });
-
-    // Function to collect questions from the survey information
-    function collectQuestions() {
-        const questions = [];
-
-        // Iterate over each question field and collect question information
-        const questionFields = document.querySelectorAll('.questionField');
-        questionFields.forEach((questionField, index) => {
-            const questionType = questionField.getAttribute('data-question-type');
-            let questionText;
-
-            if (questionType === 'multiple_choice') {
-                questionText = questionField.querySelector('input[type="text"]').value;
-            } else if (questionType === 'short_answers') {
-                questionText = questionField.querySelector('textarea').value;
-            }
-
-            // Build the question object
-            const question = {
-                '_id': questionField.querySelector('input[type="hidden"]').value, // 获取问题的ID
-                'qType': questionType,
-                'qText': questionText
-            };
-
-            if (questionType === 'multiple_choice') {
-                question['options'] = []; // Ensure the question object has 'options' property
-                const choiceInputs = questionField.querySelectorAll('.choiceText');
-                choiceInputs.forEach(choiceInput => {
-                    const choiceText = choiceInput.value;
-                    question['options'].push(choiceText);
-                });
-            }
-
-            // Add the question object to the array
-            questions.push(question);
-        });
-
-        // Return the questions array
-        return questions;
-    }
-</script>
+<script src="/server/views/scripts/EditQuestion.js"></script>

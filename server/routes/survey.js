@@ -85,7 +85,7 @@ router.get("/update/:id", async (req, res, next) => {
 router.post("/update/:id", async (req, res) => {
   const surveyId = req.params.id;
   const { title, description, startTime, endTime, questions } = req.body;
-
+  console.log(req.body)
   try {
       // 查找要更新的调查
       const survey = await Survey.findById(surveyId);
