@@ -1,6 +1,7 @@
+/* This code snippet is a JavaScript file that defines a user schema using Mongoose, a popular Node.js
+library for MongoDB. Here's a breakdown of what each part of the code does: */
 // 引入所需的模块
 let mongoose = require("mongoose");
-// let passportLocalMongoose = require("passport-local-mongoose");
 
 // 定义用户模式
 let userSchema = new mongoose.Schema({
@@ -11,9 +12,6 @@ let userSchema = new mongoose.Schema({
     userType: { type: String }, // 用户类型
     created: { type: Date, default: Date.now } // 创建时间
 });
-
-// 通过 passport-local-mongoose 插件来处理用户认证相关功能
-// userSchema.plugin(passportLocalMongoose);
 
 // 创建用户模型
 module.exports = mongoose.model('User', userSchema);

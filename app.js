@@ -5,12 +5,28 @@ var path = require('path'); // Node.js 提供的路径处理模块
 var cookieParser = require('cookie-parser'); // 解析 Cookie 的中间件
 var logger = require('morgan'); // 日志记录中间件
 const bodyParser = require('body-parser');
+let DB = require('./server/config/db'); // 引入数据库配置文件
+var app = express(); // 创建 Express 应用程序实例
+
+
+// 引入 Passport 和 JWT
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const flash = require('express-flash');
+
+// 引入用户模型
+const User = require("./server/models/user");
+
+
 
 // 引入路由模块
 var indexRouter = require('./server/routes/index'); // 主页路由
 var usersRouter = require('./server/routes/users'); // 用户路由
 var surveyRouter = require('./server/routes/survey'); // 调查路由
-var app = express(); // 创建 Express 应用程序实例
+
 
 // 设置视图引擎和视图文件夹路径
 app.set('views', path.join(__dirname, 'server', 'views')); // 设置视图文件夹路径为当前目录下server下的 views 文件夹
@@ -25,14 +41,57 @@ app.use(cookieParser()); // 使用 Cookie 解析中间件
 app.use(express.static(path.join(__dirname, 'public'))); // 设置静态文件目录为当前目录下的 public 文件夹
 app.use('/server', express.static('server'));
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// 使用 express-session 中间件来管理会话
+app.use(session({ secret: "MySecret", resave: false, saveUninitialized: false }));
+app.use(flash());
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport 配置
+passport.use(
+  new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
+    try {
+      // 查找用户
+      const user = await User.findOne({ email: email });
+      if (!user) {
+        return done(null, false, { message: "Invalid email or password" });
+      }
+
+      // 比较密码
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch) {
+        return done(null, user);
+      } else {
+        return done(null, false, { message: "Invalid email or password" });
+      }
+    } catch (err) {
+      return done(err);
+    }
+  })
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user._id); // 使用用户文档的 id 字段作为唯一标识符
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});
+
+
 // 使用各个路由模块
 app.use('/', indexRouter); // 使用主页路由
 app.use('/users', usersRouter); // 使用用户路由
 app.use('/survey', surveyRouter); // 使用调查路由
 
+
 // 数据库设置
 let mongoose = require('mongoose'); // 引入 Mongoose 模块
-let DB = require('./server/config/db'); // 引入数据库配置文件
+
 
 // 将 Mongoose 指向数据库 URI
 // 通过 Mongoose 连接到本地 MongoDB 数据库

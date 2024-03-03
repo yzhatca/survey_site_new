@@ -2,14 +2,43 @@
 const express = require("express");
 const router = express.Router();
 const { Survey, Question, Answer } = require("../models/survey");
+const passport = require("passport");
+
+// 登录验证中间件
+function requireAuth(req, res, next)
+{
+    // check if the user is logged in
+    if(!req.isAuthenticated())
+    {
+        return res.redirect('/users/login');
+    }
+    next();
+}
+
 
 // 添加调查问卷
-router.get("/add", (req, res, next) => {
+router.get("/",async (req, res, next) => {
+  try {
+    // 从数据库中获取调查问卷列表
+    const surveyList = await Survey.find();
+    // 渲染页面并将调查问卷列表传递给模板引擎
+    res.render("page/list", {
+      title: "Surveys",
+      SurveyList:surveyList,
+      isLogin:false
+    });
+  } catch (error) {
+    // 错误处理
+    next(error);
+  }
+});
+
+router.get("/add",requireAuth, (req, res, next) => {
   // 跳转到 page 中的 addSurvey.ejs 页
   res.render("page/add", { title: "Add Survey" });
 });
 
-router.post("/add", async (req, res) => {
+router.post("/add",requireAuth, async (req, res) => {
   try {
     // 解析收到的数据
     const { title, description, startTime, endTime, questions } = req.body;
@@ -56,7 +85,7 @@ router.post("/add", async (req, res) => {
 });
 
 
-router.get("/update/:id", async (req, res, next) => {
+router.get("/update/:id", requireAuth,async (req, res, next) => {
   try {
     const id = req.params.id;
 
@@ -82,7 +111,7 @@ router.get("/update/:id", async (req, res, next) => {
 });
 
 // 编辑调查问卷
-router.post("/update/:id", async (req, res) => {
+router.post("/update/:id", requireAuth, async (req, res) => {
   const surveyId = req.params.id;
   const { title, description, startTime, endTime, questions } = req.body;
   console.log(req.body)
@@ -130,11 +159,11 @@ router.get("/list", async (req, res, next) => {
   try {
     // 从数据库中获取调查问卷列表
     const surveyList = await Survey.find();
-    console.log(surveyList)
     // 渲染页面并将调查问卷列表传递给模板引擎
     res.render("page/list", {
       title: "Surveys",
-      SurveyList:surveyList
+      SurveyList:surveyList,
+      isLogin:true
     });
   } catch (error) {
     // 错误处理
@@ -204,7 +233,7 @@ router.post('/take/:id', async (req, res) => {
 });
 
 // 删除调查问卷
-router.get('/delete/:id', async (req, res) => {
+router.get('/delete/:id',requireAuth, async (req, res) => {
   try {
     const surveyId = req.params.id;
 
