@@ -7,6 +7,7 @@ const passport = require("passport");
 // 登录验证中间件
 function requireAuth(req, res, next)
 {
+    console.log(req.user)
     // check if the user is logged in
     if(!req.isAuthenticated())
     {

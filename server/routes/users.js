@@ -10,32 +10,30 @@ const DB = require('../config/db')
 router.get("/login", (req, res) => {
     // 渲染登录页面
     res.render("auth/login", { messages: req.flash('error'), title: "Login" });
-  });
-  
+});
 
 // 处理登录表单提交
 router.post("/login", (req, res, next) => {
     passport.authenticate('local', { session: false }, (err, user, info) => {
         if (err || !user) {
-            console.log(user)
             return res.status(400).json({
                 message: info ? info.message : 'Login failed',
                 user: user
             });
         }
-
-        req.login(user, { session: false }, (err) => {
+        //在调用 req.login() 后，Express 将在会话中持久化用户信息，并且 req.isAuthenticated() 将会返回 true，表明用户已经通过身份验证。
+        req.login(user, (err) => {
             if (err) {
                 res.send(err);
             }
-
+            console.log(user)
             // User found and password matched, now create and sign JWT
             const token = jwt.sign({ id: user.id }, DB.Secret,{
                 expiresIn: '1h'
             });
-
+            console.log(token)
             // Redirect to list page with JWT token in query parameter
-           return res.redirect('/survey/list');
+        return res.redirect('/survey/list');
         });
     })(req, res, next);
 });

@@ -43,7 +43,11 @@ app.use('/server', express.static('server'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // 使用 express-session 中间件来管理会话
-app.use(session({ secret: "MySecret", resave: false, saveUninitialized: false }));
+app.use(session({
+  secret: 'mySecret', // 用于对 session 数据进行加密的密钥，可以是任意字符串
+  resave: false, // 是否每次请求都重新保存 session 数据，默认为 true
+  saveUninitialized: false, // 是否自动保存未初始化的 session 数据，默认为 true
+}))
 app.use(flash());
 // Passport middleware
 app.use(passport.initialize());
@@ -73,13 +77,16 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user._id); // 使用用户文档的 id 字段作为唯一标识符
+  done(null, user.id); // 使用用户文档的 id 字段作为唯一标识符
 });
 
-passport.deserializeUser((id, done) => {
-  User.findById(id, (err, user) => {
-    done(err, user);
-  });
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
 });
 
 
