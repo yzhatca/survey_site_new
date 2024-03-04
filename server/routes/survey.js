@@ -60,7 +60,7 @@ router.post("/add",requireAuth, async (req, res) => {
     await survey.save();
 
     // 返回成功消息
-    res.render('/survey/list',{ success: true, message: "Survey added successfully",username: req.user ? req.user.username : "",})
+    res.redirect('/survey/manage')
   } catch (error) {
     // 如果发生错误，返回错误消息
     console.error("Error adding survey:", error);
@@ -131,7 +131,7 @@ router.post("/update/:id", requireAuth, async (req, res) => {
 
       // 保存更新后的调查问卷
       await survey.save();
-      res.render('/survey/list',{ success: true, message: "Survey updated successfully",username: req.user ? req.user.username : "",})
+      res.redirect('/survey/manage')
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -158,19 +158,35 @@ router.get("/list", async (req, res, next) => {
 // 管理调查问卷
 router.get("/manage", requireAuth, async (req, res, next) => {
   try {
-    // 从数据库中获取当前用户创建的调查问卷列表
-    const surveyList = await Survey.find({ creator: req.user.id });
-    // 渲染页面并将调查问卷列表传递给模板引擎
+    // 获取当前页码，默认为1
+    const page = parseInt(req.query.page) || 1;
+    // 每页显示的调查问卷数量
+    const perPage = 3;
+
+    // 查询数据库中当前用户创建的调查问卷，跳过前 (page - 1) * perPage 条，限制返回 perPage 条
+    const surveyList = await Survey.find({ creator: req.user.id })
+                                   .skip((page - 1) * perPage)
+                                   .limit(perPage);
+    // 获取总调查问卷数量
+    const totalSurveys = await Survey.countDocuments({ creator: req.user.id });
+
+    // 计算总页数
+    const totalPages = Math.ceil(totalSurveys / perPage);
+
+    // 渲染页面并将调查问卷列表和分页信息传递给模板引擎
     res.render("page/manageList", {
       title: "Surveys",
       username: req.user.username,
       SurveyList: surveyList,
+      currentPage: page,
+      totalPages: totalPages,
     });
   } catch (error) {
     // 错误处理
     next(error);
   }
 });
+
 
 
 // 获取单个调查问卷
@@ -236,24 +252,25 @@ router.post('/take/:id', async (req, res) => {
 });
 
 // 删除调查问卷
-router.get('/delete/:id',requireAuth, async (req, res) => {
+// 删除调查问卷以及关联的问题和答案
+router.get('/delete/:id', requireAuth, async (req, res) => {
   try {
     const surveyId = req.params.id;
 
-    // 使用 findByIdAndDelete 方法来删除调查问卷
+    // 查找并删除调查问卷
     const deletedSurvey = await Survey.findByIdAndDelete(surveyId);
     
     if (!deletedSurvey) {
-      // 如果找不到要删除的调查问卷
       return res.status(404).json({ success: false, message: 'Survey not found' });
     }
 
-    // 删除与调查问卷相关联的问题
-    await Question.deleteMany({ _id: { $in: deletedSurvey.questions } });
+    // 找到与调查问卷关联的问题并删除
+    const deletedQuestions = await Question.deleteMany({ _id: { $in: deletedSurvey.questions } });
 
-    // 删除与调查问卷相关联的答案
+    // 删除与调查问卷关联的答案
     await Answer.deleteMany({ surveyId });
-    res.redirect('/survey/list')
+
+    res.redirect('/survey/manage');
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });

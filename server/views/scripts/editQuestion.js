@@ -27,7 +27,6 @@ function generateQuestionField(questionType, questionNumber) {
                 <label for="shortAnswer${questionNumber}Text">Question ${questionNumber}</label>
                 <br>
                 <textarea id="shortAnswer${questionNumber}Text" required></textarea>
-                <input type="hidden" name="shortAnswer${questionNumber}" value="">
                 <button type="button" class="deleteQuestion">Delete Question</button>
             </div>
         `;
@@ -124,12 +123,6 @@ function collectQuestions() {
             'qType': questionType,
             'qText': questionText
         };
-
-        // Check if _id exists, if yes, add it to the question object
-        const questionId = questionField.querySelector('input[type="hidden"]').value;
-        if (questionId) {
-            question['_id'] = questionId;
-        }
 
         if (questionType === 'multiple_choice') {
             question['options'] = []; // Ensure the question object has 'options' property
