@@ -8,18 +8,21 @@ const DB = require('../config/db')
 
 
 router.get("/login", (req, res) => {
-    // 渲染登录页面
-    res.render("auth/login", { messages: req.flash('error'), title: "Login" });
+    // 渲染登录页面，并传递闪存消息
+    res.render("auth/login", { messages: req.flash('loginMessage'), title: "Login", username: req.user ? req.user.username : "" });
 });
 
 // 处理登录表单提交
 router.post("/login", (req, res, next) => {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
-        if (err || !user) {
-            return res.status(400).json({
-                message: info ? info.message : 'Login failed',
-                user: user
-            });
+    passport.authenticate('local', (err, user, info) => {
+        //server errr?
+        if (err) {
+            return next(err);
+        }
+        //if there a user login error?
+        if (!user) {
+            req.flash('loginMessage', 'Incorrect Username or Password');
+            return res.redirect('login');
         }
         //在调用 req.login() 后，Express 将在会话中持久化用户信息，并且 req.isAuthenticated() 将会返回 true，表明用户已经通过身份验证。
         req.login(user, (err) => {
@@ -33,22 +36,32 @@ router.post("/login", (req, res, next) => {
             });
             console.log(token)
             // Redirect to list page with JWT token in query parameter
-        return res.redirect('/survey/list');
+            return res.redirect('/survey/list');
         });
     })(req, res, next);
 });
 
 
-
+// 注册页面
 // 注册页面
 router.post("/register", async (req, res) => {
-    const { username, password, email} = req.body;
+    const { username, password, email } = req.body;
 
     try {
-        // 检查用户名是否已经存在
-        const existingUser = await User.findOne({ username });
+        // 检查用户名和邮箱是否已经存在
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
-            return res.status(400).json({ error: 'Username already exists' });
+            let errorMessage = '';
+            if (existingUser.email === email) {
+                errorMessage = 'Email already exists';
+            } else if(existingUser.username === username) {
+                errorMessage = 'username already exists'
+            }
+            return res.render("auth/register", {
+                title: "Register",
+                username: req.user ? req.username : "",
+                messages: errorMessage
+            });
         }
 
         // 生成密码哈希
@@ -64,38 +77,27 @@ router.post("/register", async (req, res) => {
 
         // 保存用户到数据库
         await newUser.save();
-
-        res.status(201).json({ message: 'User registered successfully' });
-        res.redirect("page/user/login"); // 注册成功后重定向到登录页面
+        res.redirect("login"); // 注册成功后重定向到登录页面
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-// // 处理注册表单提交
-// router.post("/register", async (req, res) => {
-//   try {
-//     const { username, email, password } = req.body;
-//     // 检查用户名是否已经存在
-//     const existingUser = await User.findOne({ username });
-//     if (existingUser) {
-//       return res.status(400).send("Username already exists");
-//     }
-//     // 创建新用户
-//     const newUser = new User({ username, email, password });
-//     await newUser.save();
-//     res.redirect("page/user/login"); // 注册成功后重定向到登录页面
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send("Internal Server Error");
-//   }
-// });
 
 router.get("/register", (req, res) => {
     // 渲染注册页面
-    res.render("auth/register", { title: "Register" });
-  });
-  
+    res.render("auth/register", { title: "Register", username: req.user ? req.user.username : "",});
+});
+router.get("/logout", (req, res) => {
+    req.logout(function (err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect('index');// 重定向到登录页面
+    }); // 注销用户会话
+});
+
+
 
 module.exports = router;

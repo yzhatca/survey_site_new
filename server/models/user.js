@@ -5,9 +5,10 @@ let mongoose = require("mongoose");
 
 // 定义用户模式
 let userSchema = new mongoose.Schema({
-    username: { type: String, required: true }, // 用户名
+// 用户名, 允许重复
     password: { type: String, required: true }, // 密码
-    email: { type: String, required: true }, // 邮箱
+    email: { type: String, required: true, unique: true }, // 邮箱
+    username: { type: String }, 
     displayName: { type: String }, // 显示名
     userType: { type: String }, // 用户类型
     created: { type: Date, default: Date.now } // 创建时间

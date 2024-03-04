@@ -2,6 +2,14 @@
 
 <%- include ../partials/main_nav.ejs %>
 <h1>Register</h1>
+<div class="message">
+  <!-- Message Area -->
+  <% if(messages.length > 0) {%>
+  <div class="alert alert-danger">
+      <%= messages %>
+  </div>
+  <% } %>
+</div>
 <form method="POST">
   <div>
     <label for="username">Username</label>

@@ -16,35 +16,17 @@ function requireAuth(req, res, next)
     next();
 }
 
-
-// 添加调查问卷
-router.get("/",async (req, res, next) => {
-  try {
-    // 从数据库中获取调查问卷列表
-    const surveyList = await Survey.find();
-    // 渲染页面并将调查问卷列表传递给模板引擎
-    res.render("page/list", {
-      title: "Surveys",
-      SurveyList:surveyList,
-      isLogin:false
-    });
-  } catch (error) {
-    // 错误处理
-    next(error);
-  }
-});
-
 router.get("/add",requireAuth, (req, res, next) => {
   // 跳转到 page 中的 addSurvey.ejs 页
-  res.render("page/add", { title: "Add Survey" });
+  res.render("page/add", { title: "Add Survey" ,username: req.user ? req.user.username : "",});
 });
 
 router.post("/add",requireAuth, async (req, res) => {
   try {
     // 解析收到的数据
     const { title, description, startTime, endTime, questions } = req.body;
-    console.log(req.body);
-
+    
+    const userId = req.user._id
     // 将字符串类型的 questions 解析为数组对象
     const parsedQuestions = JSON.parse(questions);
 
@@ -66,6 +48,7 @@ router.post("/add",requireAuth, async (req, res) => {
 
     // 创建调查问卷对象
     const survey = new Survey({
+      creator:userId,
       title,
       description,
       startTime: new Date(startTime),
@@ -77,7 +60,7 @@ router.post("/add",requireAuth, async (req, res) => {
     await survey.save();
 
     // 返回成功消息
-    res.status(200).json({ message: "Survey added successfully" });
+    res.render('/survey/list',{ success: true, message: "Survey added successfully",username: req.user ? req.user.username : "",})
   } catch (error) {
     // 如果发生错误，返回错误消息
     console.error("Error adding survey:", error);
@@ -104,6 +87,7 @@ router.get("/update/:id", requireAuth,async (req, res, next) => {
     res.render("page/edit", {
       title: "Edit Survey",
       survey: survey,
+      username: req.user ? req.user.username : "",
     });
   } catch (err) {
     console.error(err);
@@ -147,8 +131,7 @@ router.post("/update/:id", requireAuth, async (req, res) => {
 
       // 保存更新后的调查问卷
       await survey.save();
-
-      res.json({ message: "Survey updated successfully" });
+      res.render('/survey/list',{ success: true, message: "Survey updated successfully",username: req.user ? req.user.username : "",})
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -164,13 +147,31 @@ router.get("/list", async (req, res, next) => {
     res.render("page/list", {
       title: "Surveys",
       SurveyList:surveyList,
-      isLogin:true
+      username: req.user? req.user.username:""
     });
   } catch (error) {
     // 错误处理
     next(error);
   }
 });
+
+// 管理调查问卷
+router.get("/manage", requireAuth, async (req, res, next) => {
+  try {
+    // 从数据库中获取当前用户创建的调查问卷列表
+    const surveyList = await Survey.find({ creator: req.user.id });
+    // 渲染页面并将调查问卷列表传递给模板引擎
+    res.render("page/manageList", {
+      title: "Surveys",
+      username: req.user.username,
+      SurveyList: surveyList,
+    });
+  } catch (error) {
+    // 错误处理
+    next(error);
+  }
+});
+
 
 // 获取单个调查问卷
 router.get("/take/:id", async (req, res, next) => {
@@ -189,7 +190,7 @@ router.get("/take/:id", async (req, res, next) => {
     }
     
     // 显示编辑视图
-    res.render("page/takeSurvey", {
+    res.render("page/takeSurvey", {username: req.user ? req.user.username : "",
       title: "Take Survey",
       survey: survey,
     });
@@ -202,6 +203,7 @@ router.get("/take/:id", async (req, res, next) => {
 // 提交调查问卷答案
 router.post('/take/:id', async (req, res) => {
   try {
+      const userId = req.user ? req.user._id : null
       const surveyId = req.params.id;
       const responses = req.body;
       console.log(responses, typeof responses);
@@ -215,6 +217,7 @@ router.post('/take/:id', async (req, res) => {
           if (questionId in responses) {
               const answer = responses[questionId];
               const newAnswer = new Answer({
+                  userId,
                   questionId, // 使用问题的 ID
                   surveyId, // 使用调查问卷的 ID
                   answer,
@@ -225,8 +228,7 @@ router.post('/take/:id', async (req, res) => {
 
       // 将答案存储到数据库中
       await Answer.insertMany(newAnswers);
-
-      res.status(200).json({ success: true, message: 'Answers submitted successfully', answers: newAnswers });
+      res.render('/survey/list',{ success: true, message: 'Answers submitted successfully',username: req.user ? req.user.username : "",})
   } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -251,8 +253,7 @@ router.get('/delete/:id',requireAuth, async (req, res) => {
 
     // 删除与调查问卷相关联的答案
     await Answer.deleteMany({ surveyId });
-
-    res.status(200).json({ success: true, message: 'Survey deleted successfully' });
+    res.redirect('/survey/list')
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });

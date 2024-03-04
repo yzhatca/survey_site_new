@@ -6,7 +6,7 @@ var router = express.Router();
 /* GET home page. */
 //req请求第一位，res第二位
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Express', username: req.user ? req.user.username : "", });
 });
 
 

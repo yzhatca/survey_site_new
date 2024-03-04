@@ -12,6 +12,14 @@
   <!-- Homepage -->
   <%- include partials/header.ejs %>
     <%- include partials/main_nav.ejs %>
+    <div class="message">
+      <!-- Message Area -->
+      <% if(messages.length> 0) {%>
+        <div class="alert alert-danger">
+          <%= messages %>
+        </div>
+        <% } %>
+
     <section>
       <div class="container">
         <img src="images/logo4.PNG" alt="logo" id="logo">
@@ -21,7 +29,7 @@
             <h2>A leading company in survey software. <br> Create your survey with us.</h2>
             <div>
               <a href="/survey/add">Create new Survey</a>&nbsp;
-              <a href="/survey/display">View Available Surveys</a>
+              <a href="/survey/list">View Available Surveys</a>
             </div>
           </div>
           <div>

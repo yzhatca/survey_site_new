@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+const User = require('../models/user'); // Update the path accordingly
 const questionSchema = new Schema({
     qType: { type: String, enum: ['multiple_choice', 'short_answers'], required: true },
     qText: { type: String, required: true },
@@ -8,7 +8,7 @@ const questionSchema = new Schema({
 });
 
 const answerSchema = new Schema({
-    // userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', default:null},
     questionId: { type: Schema.Types.ObjectId, ref: 'Question', required: true },
     surveyId: { type: Schema.Types.ObjectId, ref: 'Survey', required: true },
     answer: { type: Schema.Types.Mixed },
@@ -17,10 +17,10 @@ const answerSchema = new Schema({
 
 const surveySchema = new Schema({
     title: { type: String, required: true },
-    description: { type: String },
-    creator: { type: Schema.Types.ObjectId, ref: 'User' },
+    description: { type: String , required: true},
+    creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     createTime: { type: Date, default: Date.now },
-    startTime: { type: Date },
+    startTime: { type: Date,},
     endTime: { type: Date },
     questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }] // 关联问题
 });
