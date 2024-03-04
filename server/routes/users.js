@@ -89,12 +89,13 @@ router.get("/register", (req, res) => {
     // 渲染注册页面
     res.render("auth/register", { title: "Register", username: req.user ? req.user.username : "",});
 });
+
 router.get("/logout", (req, res) => {
     req.logout(function (err) {
         if (err) {
             return next(err);
         }
-        res.redirect('index');// 重定向到登录页面
+        res.redirect('/');// 重定向到登录页面
     }); // 注销用户会话
 });
 

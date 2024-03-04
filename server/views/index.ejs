@@ -1,44 +1,32 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <title>
-    <%= title %>
-  </title>
-  <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-
 <body>
   <!-- Homepage -->
   <%- include partials/header.ejs %>
     <%- include partials/main_nav.ejs %>
-    <div class="message">
-      <!-- Message Area -->
-      <% if(messages.length> 0) {%>
-        <div class="alert alert-danger">
-          <%= messages %>
-        </div>
-        <% } %>
+      <div class="message">
+        <!-- Message Area -->
+        <% if(messages.length> 0) {%>
+          <div class="alert alert-danger">
+            <%= messages %>
+          </div>
+          <% } %>
 
-    <section>
-      <div class="container">
-        <img src="images/logo4.PNG" alt="logo" id="logo">
-          <div class="row">
-          <div>
-            <h1>Welcome to <br> <span>Survey Donkey!</span></h1>
-            <h2>A leading company in survey software. <br> Create your survey with us.</h2>
-            <div>
-              <a href="/survey/add">Create new Survey</a>&nbsp;
-              <a href="/survey/list">View Available Surveys</a>
-            </div>
-          </div>
-          <div>
-            <img src="images/resources.png" class="img-fluid" alt="girl_pic">
-          </div>
-          </div>
-        </div>
+            <section id="hero" class="d-flex align-items-center">
+              <div class="container">
+                <img src="images/logo4.PNG" alt="logo" id="logo">
+                <div class="row">
+                  <div class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="200">
+                    <h1>Welcome to <br> <span>Survey Donkey!</span></h1>
+                    <h2>A leading company in survey software. <br> Create your survey with us.</h2>
+                    <div class="d-flex justify-content-center justify-content-lg-start">
+                      <a href="/survey/add" class="btn btn-outline-secondary btn-lg px-4" id="take-btn">Create new Survey</a>&nbsp;
+                      <a href="/survey/list" class="btn btn-outline-secondary btn-lg px-4" id="view-btn">View Available Surveys</a>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
+                    <img src="images/resources.png" class="img-fluid" alt="girl_pic">
+                  </div>
+                </div>
+              </div>
       </div>
       <%- include partials/footer.ejs %>
 </body>
-
-</html>
