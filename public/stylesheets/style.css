@@ -191,6 +191,18 @@ body {
   box-shadow: 0 0 0 1px #007bff, 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
+.card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  max-width: 400px; /* 设置最大宽度 */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+  transition: box-shadow 0.3s ease; /* 添加过渡效果 */
+}
+
+.card:hover {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* 鼠标悬停时增加阴影 */
+}
+
 /* Survey List Page */
 
 /* Media Queries */

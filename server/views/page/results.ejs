@@ -2,10 +2,101 @@
 
 <%- include ../partials/main_nav.ejs %>
 
-<div class="container">
-    <h1>
-        display survey
-    </h1>
+<div class="container" >
+    <h1>Survey Result</h1>
+    <div id="surveyResults" class="card-deck"></div>
 </div>
 
 <%- include ../partials/footer.ejs %>
+
+<!-- 引入 Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // 使用 Fetch API 获取数据
+    fetch('/survey/api/answers')
+        .then(response => response.json())
+        .then(data => {
+            // 渲染数据到页面上
+            renderSurveyResults(data);
+            // 渲染饼图
+            renderPieCharts(data);
+        })
+        .catch(error => console.error('Error fetching survey data:', error));
+
+    // 渲染调查结果到页面上的函数
+    function renderSurveyResults(data) {
+        const surveyResultsContainer = document.getElementById('surveyResults');
+
+        // 渲染问题
+        data.questions.forEach(question => {
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('card', 'text-center', 'mb-1','d-flex', 'justify-content-center', 'align-items-center');
+            questionElement.innerHTML = `
+                <div class="card-body">
+                    <h5 class="card-title">Question:${question.text}</h5>
+                    <canvas id="chart-${question._id}" width="300" height="300"></canvas>
+                </div>
+            `;
+            surveyResultsContainer.appendChild(questionElement);
+        });
+    }
+
+    // 渲染饼图的函数
+    function renderPieCharts(data) {
+        // 渲染每个问题的饼图
+        data.questions.forEach(question => {
+            // 获取问题对应的答案数组
+            const answers = data.questionAnswers[question._id];
+
+            // 统计答案数量
+            const answerCounts = {};
+            answers.forEach(answer => {
+                answerCounts[answer] = (answerCounts[answer] || 0) + 1;
+            });
+
+            // 准备标签和数据
+            const labels = Object.keys(answerCounts);
+            const dataValues = Object.values(answerCounts);
+
+            // 创建饼图
+            new Chart(`chart-${question._id}`, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: false, // 禁用响应式
+                    maintainAspectRatio: false, // 禁用纵横比保持
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                const dataset = data.datasets[tooltipItem.datasetIndex];
+                                const label = dataset.labels[tooltipItem.index];
+                                const value = dataset.data[tooltipItem.index];
+                                return `${label}: ${value}`;
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    }
+</script>
+
+<style>
+
+
+</style>

@@ -29,12 +29,10 @@ router.post("/login", (req, res, next) => {
             if (err) {
                 res.send(err);
             }
-            console.log(user)
             // User found and password matched, now create and sign JWT
             const token = jwt.sign({ id: user.id }, DB.Secret,{
                 expiresIn: '1h'
             });
-            console.log(token)
             // Redirect to list page with JWT token in query parameter
             return res.redirect('/survey/list');
         });
