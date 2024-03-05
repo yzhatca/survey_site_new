@@ -20,7 +20,6 @@ const surveySchema = new Schema({
     description: { type: String , required: true},
     creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     createTime: { type: Date, default: Date.now },
-    startTime: { type: Date,},
     endTime: { type: Date },
     questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }] // 关联问题
 });

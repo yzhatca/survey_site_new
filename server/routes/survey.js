@@ -24,7 +24,7 @@ router.get("/add", requireAuth, (req, res, next) => {
 router.post("/add", requireAuth, async (req, res) => {
   try {
     // 解析收到的数据
-    const { title, description, startTime, endTime, questions } = req.body;
+    const { title, description, endTime, questions } = req.body;
 
     const userId = req.user._id;
     // 将字符串类型的 questions 解析为数组对象
@@ -53,7 +53,6 @@ router.post("/add", requireAuth, async (req, res) => {
       creator: userId,
       title,
       description,
-      startTime: new Date(startTime),
       endTime: new Date(endTime),
       questions: questionIds, // 将问题的 ObjectId 数组存储在调查问卷中
     });
@@ -63,10 +62,10 @@ router.post("/add", requireAuth, async (req, res) => {
 
     // 返回成功消息
     res.redirect("/survey/manage");
-  } catch (error) {
+  } catch (err) {
     // 如果发生错误，返回错误消息
-    console.error("Error adding survey:", error);
-    res.status(500).json({ error: "Failed to add survey" });
+    console.error("Error adding survey:", err);
+    next(err); // 将错误传递给全局错误处理中间件
   }
 });
 
@@ -91,15 +90,15 @@ router.get("/update/:id", requireAuth, async (req, res, next) => {
       username: req.user ? req.user.username : "",
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal Server Error");
+    console.error("Updating survey, getting survey list error",err);
+    next(err); // 将错误传递给全局错误处理中间件
   }
 });
 
 // 编辑调查问卷
-router.post("/update/:id", requireAuth, async (req, res) => {
+router.post("/update/:id", requireAuth, async (req, res, next) => {
   const surveyId = req.params.id;
-  const { title, description, startTime, endTime, questions } = req.body;
+  const { title, description, endTime, questions } = req.body;
   console.log(req.body);
   try {
     // 查找要更新的调查问卷
@@ -111,7 +110,6 @@ router.post("/update/:id", requireAuth, async (req, res) => {
     // 更新调查问卷信息
     survey.title = title;
     survey.description = description;
-    survey.startTime = startTime;
     survey.endTime = endTime;
     const parsedQuestions = JSON.parse(questions);
     // 更新或创建问题
@@ -135,9 +133,9 @@ router.post("/update/:id", requireAuth, async (req, res) => {
     // 保存更新后的调查问卷
     await survey.save();
     res.redirect("/survey/manage");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+  } catch (err) {
+    console.error("Updating survey error",err);
+    next(err); 
   }
 });
 
@@ -162,10 +160,10 @@ router.get("/list", async (req, res, next) => {
       currentPage: page,
       totalPages: totalPages,
     });
-  } catch (error) {
+  } catch (err) {
     // 错误处理
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Getting survey list error",err);
+    next(err); 
   }
 });
 
@@ -176,7 +174,7 @@ router.get("/result/:id",requireAuth, (req, res) => {
   res.render('page/results', { username: req.user ? req.user.username : "" });
 });
 
-router.get('/api/answers', requireAuth, async (req, res) => {
+router.get('/api/answers', requireAuth, async (req, res, next) => {
   try {
     const surveyId = req.session.surveyId; // 从会话中获取动态 id 参数
 
@@ -210,9 +208,9 @@ router.get('/api/answers', requireAuth, async (req, res) => {
     // 渲染视图并传递数据
     res.json({ questionAnswers: questionAnswers, questions: filteredQuestions, username: req.user ? req.user.username : "", id: surveyId });
 
-  } catch (error) {
-    console.error('Error retrieving survey results:', error);
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err) {
+    console.error("API Getting survey list error",err);
+    next(err); 
   }
 });
 
@@ -245,9 +243,10 @@ router.get("/manage", requireAuth, async (req, res, next) => {
       currentPage: page,
       totalPages: totalPages,
     });
-  } catch (error) {
+  } catch (err) {
     // 错误处理
-    next(error);
+    console.log("managing survey list error", err)
+    next(err);
   }
 });
 
@@ -279,12 +278,12 @@ router.get("/take/:id", async (req, res, next) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal Server Error");
+    next(err); 
   }
 });
 
 // 提交调查问卷答案
-router.post("/take/:id", async (req, res) => {
+router.post("/take/:id", async (req, res, next) => {
   try {
     const userId = req.user ? req.user._id : null;
     const surveyId = req.params.id;
@@ -312,15 +311,14 @@ router.post("/take/:id", async (req, res) => {
     // 将答案存储到数据库中
     await Answer.insertMany(newAnswers);
     res.redirect("/survey/list");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+  } catch (err) {
+    console.error("Updating survey, getting survey list error",err);
+    next(err); 
   }
 });
 
-// 删除调查问卷
 // 删除调查问卷以及关联的问题和答案
-router.get("/delete/:id", requireAuth, async (req, res) => {
+router.get("/delete/:id", requireAuth, async (req, res, next) => {
   try {
     const surveyId = req.params.id;
 
@@ -342,10 +340,22 @@ router.get("/delete/:id", requireAuth, async (req, res) => {
     await Answer.deleteMany({ surveyId });
 
     res.redirect("/survey/manage");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+  } catch (err) {
+    console.error(err);
+    next(err); 
   }
 });
+
+// 错误处理中间件
+router.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Internal Server Error");
+});
+
+// 404 错误处理中间件
+router.use((req, res) => {
+  res.status(404).send("Not Found");
+});
+
 
 module.exports = router;

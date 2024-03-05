@@ -105,10 +105,10 @@ let mongoose = require('mongoose'); // 引入 Mongoose 模块
 // 通过 Mongoose 连接到本地 MongoDB 数据库
 mongoose.connect(DB.URI)
     .then(() => {
-        console.log('MongoDB 连接成功');
+        console.log('MongoDB connection success');
     })
     .catch((error) => {
-        console.error('MongoDB 连接失败:', error);
+        console.error('MongoDB connection failed:', error);
     });
 
 

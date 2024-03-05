@@ -194,7 +194,6 @@ body {
 .custom-card {
   border: 1px solid #dee2e6;
   border-radius: 1rem;
-  width: auto;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
   transition: box-shadow 0.3s ease; /* 添加过渡效果 */
   margin-right: 20px;
@@ -309,6 +308,10 @@ body {
 
 .message {
   margin-top: 40px;
+}
+
+.error-message{
+  width: 800px;
 }
 
 .main-container {

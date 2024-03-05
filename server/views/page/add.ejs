@@ -1,14 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Survey</title>
-</head>
-
-<body>
-
     <div style="height: 20px;">
         <%- include ../partials/header.ejs %>
 
@@ -30,11 +19,6 @@
                         <label for="description">Survey Description</label>
                         <textarea cols="50" class="form-control" id="description" placeholder="Enter Survey Description"
                             name="description" required></textarea>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="startDate">Start Date</label>
-                        <input type="date" class="form-control" id="startDate" name="startTime" required>
                     </div>
 
                     <div class="form-group mb-3">
@@ -63,10 +47,4 @@
     </div>
 </body>
 
-</html>
-
 <script src="/server/views/scripts/addQuestion.js"></script>
-
-</body>
-
-</html>

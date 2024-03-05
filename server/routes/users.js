@@ -41,7 +41,6 @@ router.post("/login", (req, res, next) => {
 
 
 // 注册页面
-// 注册页面
 router.post("/register", async (req, res) => {
     const { username, password, email } = req.body;
 
