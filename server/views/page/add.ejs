@@ -8,46 +8,54 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Create a Survey</h1>
+    
+<div style="height: 20px;">
+    <%- include ../partials/header.ejs %>
+
+    <%- include ../partials/main_nav.ejs %>
+</div>
+
+<div class="container justify-content-center">
+    <div class="row">
+        <div class="offset-md-3 col-md-6">
+            <h1 class="text-center">Create a Survey</h1>
         <form id="surveyForm" method="POST">
-            <div>
+            <div class="form-group mb-3">
                 <label for="surveyTitle">Survey Title</label>
-                <input type="text" id="surveyTitle" placeholder="Enter Survey Title" name="title" required>
+                <input type="text" class="form-control id="surveyTitle" placeholder="Enter Survey Title" name="title" required>
             </div>
 
-            <div>
+            <div class="form-group mb-3">
                 <label for="description">Survey Description</label>
-                <textarea cols="50" id="description" placeholder="Enter Survey Description" name="description"
+                <textarea cols="50" class="form-control" id="description" placeholder="Enter Survey Description" name="description"
                     required></textarea>
             </div>
 
-            <div>
+            <div class="form-group mb-3">
                 <label for="startDate">Start Date</label>
-                <input type="date" id="startDate" name="startTime" required>
+                <input type="date" class="form-control" id="startDate" name="startTime" required>
             </div>
 
-            <div>
+            <div class="form-group mb-3">
                 <label for="endDate">End Date</label>
-                <input type="date" id="endDate" name="endTime" required>
+                <input type="date" class="form-control" id="endDate" name="endTime" required>
             </div>
 
-            <div class="question-fields">
+            <div class="question-fields form-group mb-3">
                 <label for="questionType">Question Type</label>
-                <select name="questionType" id="questionType">
+                <select name="questionType" class="form-control custom-select" id="questionType" >
                     <option value="">Select Question Type</option>
                     <option value="multiple_choice">Multiple Choice</option>
                     <option value="short_answers">Short Answers</option>
                 </select>
             </div>
 
-            <div id="questionFields">
+            <div id="questionFields" class="form-group mb-3">
                 <!-- Question fields will be dynamically generated here -->
             </div>
 
-            <button type="button" id="addQuestion">Add Question</button>
-            <br>
-            <button type="submit">Submit</button>
+            <button type="button" id="addQuestion" class="btn btn-primary">Add Question</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 

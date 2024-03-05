@@ -7,7 +7,7 @@ function generateQuestionField(questionType, questionNumber) {
         questionField = `
             <div class="questionField" data-question-type="${questionType}">
                 <label for="question${questionNumber}Text">Question ${questionNumber}</label>
-                <input type="text" id="question${questionNumber}Text" required>
+                <input type="text" id="question${questionNumber}Text" required placeholder="Enter Survey Description">
                 <div class="choicesContainer">
                     <input type="text" class="choiceText" required>
                     <button type="button" class="removeChoice">Remove</button>
@@ -41,6 +41,7 @@ function addQuestion() {
     if (selectedType) {
         const questionNumber = questionFieldsContainer.querySelectorAll('.questionField').length + 1;
         generateQuestionField(selectedType, questionNumber);
+        questionTypeSelect.classList.add('is-valid')
         questionTypeSelect.disabled = true; // Disable the type select after choosing a type
     } else {
         alert("Please select a question type.");
@@ -68,13 +69,25 @@ questionFieldsContainer.addEventListener('click', function (event) {
 
         const newChoiceContainer = document.createElement('div');
         newChoiceContainer.classList.add('choicesContainer');
+        const choiceNumber = choicesContainer.length + 1; // 计算当前选项的序号
         newChoiceContainer.innerHTML = `
+            <label>Choice ${choiceNumber}</label> <!-- 显示选项序号 -->
             <input type="text" class="choiceText" required>
             <button type="button" class="removeChoice">Remove</button>
         `;
         questionField.insertBefore(newChoiceContainer, event.target);
+
+        // 更新选项数量并显示
+        updateChoiceCount(questionField);
     }
 });
+
+// 函数：更新选项数量并显示
+function updateChoiceCount(questionField) {
+    const numOfChoicesElement = questionField.querySelector('.numOfChoices');
+    const choicesCount = questionField.querySelectorAll('.choicesContainer').length;
+    numOfChoicesElement.textContent = 'Number of Choices: ' + choicesCount;
+}
 
 // Add event listener for "Remove" buttons for choices
 questionFieldsContainer.addEventListener('click', function (event) {
