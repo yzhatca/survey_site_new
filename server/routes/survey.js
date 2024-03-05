@@ -196,7 +196,8 @@ router.get("/manage", requireAuth, async (req, res, next) => {
   }
 });
 
-
+router.get("/result/:id", async (req, res, next) => {
+});
 
 // 获取单个调查问卷
 router.get("/take/:id", async (req, res, next) => {
