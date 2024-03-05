@@ -7,18 +7,21 @@ function generateQuestionField(questionType, questionNumber) {
         questionField = `
             <div class="questionField" data-question-type="${questionType}">
                 <label for="question${questionNumber}Text">Question ${questionNumber}</label>
-                <input type="text" id="question${questionNumber}Text" required placeholder="Enter Survey Description">
+                <input type="text" id="question${questionNumber}Text" required placeholder="Enter Survey Description" class="form-control">
+                <br>
                 <div class="choicesContainer">
-                    <input type="text" class="choiceText" required>
-                    <button type="button" class="removeChoice">Remove</button>
+                <label>Option 1:</label>
+                <input type="text" class="choiceText custom-input" required>
+                    <button type="button" class="removeChoice btn btn-danger">-</button>
                 </div>
                 <div class="choicesContainer">
-                    <input type="text" class="choiceText" required>
-                    <button type="button" class="removeChoice">Remove</button>
+                <label>Option 2:</label>
+                <input type="text" class="choiceText custom-input" required>
+                    <button type="button" class="removeChoice btn btn-danger">-</button>
                 </div>
                 
-                <button type="button" class="addChoice">Add Choice</button>
-                <button type="button" class="deleteQuestion">Delete Question</button>
+                <button type="button" class="addChoice btn btn-primary">Add Choice</button>
+                <button type="button" class="deleteQuestion btn btn-danger">Delete Question</button>
             </div>
         `;
     } else if (questionType === 'short_answers') {
@@ -26,9 +29,9 @@ function generateQuestionField(questionType, questionNumber) {
             <div class="questionField" data-question-type="${questionType}">
                 <label for="shortAnswer${questionNumber}Text">Question ${questionNumber}</label>
                 <br>
-                <textarea id="shortAnswer${questionNumber}Text" required></textarea>
+                <textarea id="shortAnswer${questionNumber}Text" class="form-control" required placeholder="Enter Question Description"></textarea>
                 <input type="hidden" name="shortAnswer${questionNumber}" value="">
-                <button type="button" class="deleteQuestion">Delete Question</button>
+                <button type="button" class="deleteQuestion btn btn-danger">Delete Question</button>
             </div>
         `;
     }
@@ -71,9 +74,9 @@ questionFieldsContainer.addEventListener('click', function (event) {
         newChoiceContainer.classList.add('choicesContainer');
         const choiceNumber = choicesContainer.length + 1; // 计算当前选项的序号
         newChoiceContainer.innerHTML = `
-            <label>Choice ${choiceNumber}</label> <!-- 显示选项序号 -->
-            <input type="text" class="choiceText" required>
-            <button type="button" class="removeChoice">Remove</button>
+            <label>Option ${choiceNumber}:</label> <!-- 显示选项序号 -->
+            <input type="text" class="choiceText custom-input" required>
+            <button type="button" class="removeChoice btn btn-danger">-</button>
         `;
         questionField.insertBefore(newChoiceContainer, event.target);
 
