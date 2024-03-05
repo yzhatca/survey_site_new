@@ -31,7 +31,7 @@
         // 渲染问题
         data.questions.forEach(question => {
             const questionElement = document.createElement('div');
-            questionElement.classList.add('card', 'text-center', 'mb-1','d-flex', 'justify-content-center', 'align-items-center');
+            questionElement.classList.add('custom-card', 'text-center', 'mb-1','d-flex', 'justify-content-center', 'align-items-center');
             questionElement.innerHTML = `
                 <div class="card-body">
                     <h5 class="card-title">Question:${question.text}</h5>

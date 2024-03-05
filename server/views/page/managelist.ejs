@@ -42,8 +42,13 @@
                                         <i class="bi bi-check-square"></i>DELETE</a>
                                 </td>
                                 <td class="text-center">
-                                    <a href="/survey/result/<%= item._id %>" class="btn-primary btn-sm">
-                                        <i class="bi bi-check-square"></i>Check</a>
+                                    <% if (item.questions.some(q => q.qType === 'short_answers')) { %>
+                                        <!-- Check if any question in the survey is short_answers -->
+                                        N/A
+                                    <% } else { %>
+                                        <a href="/survey/result/<%= item._id %>" class="btn-primary btn-sm">
+                                            <i class="bi bi-check-square"></i>Check</a>
+                                    <% } %>
                                 </td>
                             </tr>
                             <% } %>

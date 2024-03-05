@@ -169,13 +169,14 @@ router.get("/list", async (req, res, next) => {
   }
 });
 
-router.get("/result/:id", (req, res) => {
+
+router.get("/result/:id",requireAuth, (req, res) => {
   // 将动态 id 存储在会话中
   req.session.surveyId = req.params.id;
   res.render('page/results', { username: req.user ? req.user.username : "" });
 });
 
-router.get('/api/answers', async (req, res) => {
+router.get('/api/answers', requireAuth, async (req, res) => {
   try {
     const surveyId = req.session.surveyId; // 从会话中获取动态 id 参数
 
@@ -227,13 +228,15 @@ router.get("/manage", requireAuth, async (req, res, next) => {
     // 查询数据库中当前用户创建的调查问卷，跳过前 (page - 1) * perPage 条，限制返回 perPage 条
     const surveyList = await Survey.find({ creator: req.user.id })
       .skip((page - 1) * perPage)
-      .limit(perPage);
+      .limit(perPage)
+      .populate('questions'); // populate问题列表
+
     // 获取总调查问卷数量
     const totalSurveys = await Survey.countDocuments({ creator: req.user.id });
 
     // 计算总页数
     const totalPages = Math.ceil(totalSurveys / perPage);
-
+    
     // 渲染页面并将调查问卷列表和分页信息传递给模板引擎
     res.render("page/manageList", {
       title: "Surveys",
@@ -247,6 +250,10 @@ router.get("/manage", requireAuth, async (req, res, next) => {
     next(error);
   }
 });
+
+
+
+
 
 // 获取单个调查问卷
 router.get("/take/:id", async (req, res, next) => {
