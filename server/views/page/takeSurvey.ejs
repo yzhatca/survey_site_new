@@ -1,28 +1,32 @@
-<%- include ../partials/header.ejs %>
+<div style="height: 20px;">
+    <%- include ../partials/header.ejs %>
 
-<%- include ../partials/main_nav.ejs %>
-<div>
-    <h1><%= survey.title %></h1>
+    <%- include ../partials/main_nav.ejs %>
+</div>
+<div class="container justify-content-center">
+    <div class="row">
+        <div class="offset-md-3 col-md-6">
+    <h1 class="text-center"><%= survey.title %></h1>
     <!-- 提交到默认路由 -->
     <form method="post">
         <% const questions = survey.questions %>
         <% let questionNum = 1 %>
         <% for (let item of questions) { %>
-            <div>
-                <br>
-                <div>Question <%= questionNum++ %>:</div>
-                <div><%= item.qText %></div>
+            <div class="form-group mb-3">
+                <label>Question <%= questionNum++ %>:</label>
+                <div class="form-group mb-3"><%= item.qText %></div>
                 <% if (item.qType === 'short_answers') { %>
-                    <input type="text" name="<%= item._id %>" placeholder="Your answer">
+                    <input type="text" name="<%= item._id %>" placeholder="Your answer" class="form-control" required>
                 <% } else if (item.qType === 'multiple_choice') { %>
+                    <% let optionNum = 1 %>
                     <% for(let option of item.options) { %>
-                        <input type="radio" id="<%= option %>" name="<%= item._id %>" value="<%= option %>">
+                        <input type="radio" id="<%= option %>" name="<%= item._id %>" value="<%= option %>" required>
                         <label for="<%= option %>"><%= option %></label><br>
                     <% } %>
                 <% } %>
             </div>
         <% } %>
-        <button type="submit">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
 

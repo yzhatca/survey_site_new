@@ -182,6 +182,14 @@ body {
   box-shadow: 0 0 0 .25rem rgba(0, 123, 255, .25);
 }
 
+.custom-radio .custom-control-input:checked~.custom-control-label::before {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.custom-radio .custom-control-input:focus~.custom-control-label::before {
+  box-shadow: 0 0 0 1px #007bff, 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
 
 /* Survey List Page */
 

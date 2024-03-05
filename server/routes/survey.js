@@ -141,13 +141,22 @@ router.post("/update/:id", requireAuth, async (req, res) => {
 // 获取调查问卷列表
 router.get("/list", async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    // 每页显示的调查问卷数量
+    const perPage = 3;
     // 从数据库中获取调查问卷列表
-    const surveyList = await Survey.find();
+    const surveyList = await Survey.find().skip((page - 1) * perPage)
+    .limit(perPage);
+    const totalSurveys = await Survey.countDocuments();
+    // 计算总页数
+    const totalPages = Math.ceil(totalSurveys / perPage);
     // 渲染页面并将调查问卷列表传递给模板引擎
     res.render("page/list", {
       title: "Surveys",
       SurveyList:surveyList,
-      username: req.user? req.user.username:""
+      username: req.user? req.user.username:"",
+      currentPage: page,
+      totalPages: totalPages,
     });
   } catch (error) {
     // 错误处理
@@ -161,7 +170,7 @@ router.get("/manage", requireAuth, async (req, res, next) => {
     // 获取当前页码，默认为1
     const page = parseInt(req.query.page) || 1;
     // 每页显示的调查问卷数量
-    const perPage = 3;
+    const perPage = 10;
 
     // 查询数据库中当前用户创建的调查问卷，跳过前 (page - 1) * perPage 条，限制返回 perPage 条
     const surveyList = await Survey.find({ creator: req.user.id })
@@ -244,7 +253,7 @@ router.post('/take/:id', async (req, res) => {
 
       // 将答案存储到数据库中
       await Answer.insertMany(newAnswers);
-      res.render('/survey/list',{ success: true, message: 'Answers submitted successfully',username: req.user ? req.user.username : "",})
+      res.redirect('/survey/list')
   } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: 'Internal Server Error' });

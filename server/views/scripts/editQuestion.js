@@ -26,13 +26,14 @@ function generateQuestionField(questionType, questionNumber) {
         `;
   } else if (questionType === "short_answers") {
     questionField = `
-            <div class="questionField" data-question-type="${questionType}">
-                <label for="shortAnswer${questionNumber}Text">Question ${questionNumber}</label>
-                <br>
-                <textarea id="shortAnswer${questionNumber}Text" required></textarea>
-                <button type="button" class="deleteQuestion">Delete Question</button>
-            </div>
-        `;
+    <div class="questionField" data-question-type="${questionType}">
+        <label for="shortAnswer${questionNumber}Text">Question ${questionNumber}</label>
+        <br>
+        <textarea id="shortAnswer${questionNumber}Text" class="form-control" required placeholder="Enter Question Description"></textarea>
+        <input type="hidden" name="shortAnswer${questionNumber}" value="">
+        <button type="button" class="deleteQuestion btn btn-danger">Delete Question</button>
+    </div>
+`;
   }
   questionFieldsContainer.insertAdjacentHTML("beforeend", questionField);
 }
@@ -66,20 +67,23 @@ questionFieldsContainer.addEventListener("click", function (event) {
 });
 
 // Add event listener for "Add Choice" buttons
-questionFieldsContainer.addEventListener("click", function (event) {
-  if (event.target.classList.contains("addChoice")) {
-    const questionField = event.target.closest(".questionField");
-    const choicesContainer =
-      questionField.querySelectorAll(".choicesContainer");
+questionFieldsContainer.addEventListener('click', function (event) {
+    if (event.target.classList.contains('addChoice')) {
+        const questionField = event.target.closest('.questionField');
+        const choicesContainer = questionField.querySelectorAll('.choicesContainer');
 
-    const newChoiceContainer = document.createElement("div");
-    newChoiceContainer.classList.add("choicesContainer");
-    newChoiceContainer.innerHTML = `
-            <input type="text" class="choiceText" required>
-            <button type="button" class="removeChoice">Remove</button>
+        const newChoiceContainer = document.createElement('div');
+        newChoiceContainer.classList.add('choicesContainer');
+        const choiceNumber = choicesContainer.length + 1; // 计算当前选项的序号
+        newChoiceContainer.innerHTML = `
+            <label>Option ${choiceNumber}:</label> <!-- 显示选项序号 -->
+            <input type="text" class="choiceText custom-input" required>
+            <button type="button" class="removeChoice btn btn-danger">-</button>
         `;
-    questionField.insertBefore(newChoiceContainer, event.target);
-  }
+        questionField.insertBefore(newChoiceContainer, event.target);
+
+        // 更新选项数量并显示
+    }
 });
 
 // Add event listener for "Remove" buttons for choices
