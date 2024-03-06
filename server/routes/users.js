@@ -4,7 +4,7 @@ const passport = require("passport");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
-const DB = process.env
+const DB = require('../config/db')
 
 
 router.get("/login", (req, res) => {
