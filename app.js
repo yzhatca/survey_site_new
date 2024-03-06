@@ -28,6 +28,7 @@ var usersRouter = require('./server/routes/users'); // 用户路由
 var surveyRouter = require('./server/routes/survey'); // 调查路由
 
 
+
 // 设置视图引擎和视图文件夹路径
 app.set('views', path.join(__dirname, 'server', 'views')); // 设置视图文件夹路径为当前目录下server下的 views 文件夹
 
@@ -95,7 +96,6 @@ passport.deserializeUser(async (id, done) => {
 app.use('/', indexRouter); // 使用主页路由
 app.use('/users', usersRouter); // 使用用户路由
 app.use('/survey', surveyRouter); // 使用调查路由
-
 
 // 数据库设置
 let mongoose = require('mongoose'); // 引入 Mongoose 模块

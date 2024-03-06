@@ -90,7 +90,7 @@ router.get("/update/:id", requireAuth, async (req, res, next) => {
       username: req.user ? req.user.username : "",
     });
   } catch (err) {
-    console.error("Updating survey, getting survey list error",err);
+    console.error("Updating survey, getting survey list error", err);
     next(err); // 将错误传递给全局错误处理中间件
   }
 });
@@ -99,7 +99,6 @@ router.get("/update/:id", requireAuth, async (req, res, next) => {
 router.post("/update/:id", requireAuth, async (req, res, next) => {
   const surveyId = req.params.id;
   const { title, description, endTime, questions } = req.body;
-  console.log(req.body);
   try {
     // 查找要更新的调查问卷
     const survey = await Survey.findById(surveyId);
@@ -111,33 +110,40 @@ router.post("/update/:id", requireAuth, async (req, res, next) => {
     survey.title = title;
     survey.description = description;
     survey.endTime = endTime;
-    const parsedQuestions = JSON.parse(questions);
-    // 更新或创建问题
-    const updatedQuestions = await Promise.all(
-      parsedQuestions.map(async (q) => {
-        let question;
-        if (q._id) {
-          // 如果问题存在，则更新它
-          question = await Question.findByIdAndUpdate(q._id, q, { new: true });
-        } else {
-          // 如果问题不存在，则创建它
-          question = await Question.create(q);
-        }
-        return question._id;
-      })
-    );
 
-    // 更新调查问卷的问题数组
-    survey.questions = updatedQuestions;
+    // 将请求中的问题数组解析为对象数组
+    const parsedQuestions = JSON.parse(questions);
+
+    // 更新或创建问题
+    await Promise.all(parsedQuestions.map(async (q) => {
+      // 如果 qid 为 null，则创建新的问题
+      if (!q.qid) {
+        const newQuestion = await Question.create(q);
+        survey.questions.push(newQuestion._id);
+      } else {
+        // 如果 qid 存在，则查找对应的问题
+        let existingQuestion = survey.questions.find(questionId => questionId.toString() === q.qid.toString());
+
+        if (!existingQuestion) {
+          // 如果问题不存在于调查问卷中，则创建它
+          const newQuestion = await Question.create(q);
+          survey.questions.push(newQuestion._id);
+        } else {
+          // 如果问题存在于调查问卷中，则更新它
+          await Question.findByIdAndUpdate(existingQuestion, q);
+        }
+      }
+    }));
 
     // 保存更新后的调查问卷
     await survey.save();
     res.redirect("/survey/manage");
   } catch (err) {
-    console.error("Updating survey error",err);
-    next(err); 
+    console.error("Updating survey error", err);
+    next(err);
   }
 });
+
 
 // 获取调查问卷列表
 router.get("/list", async (req, res, next) => {
@@ -162,58 +168,65 @@ router.get("/list", async (req, res, next) => {
     });
   } catch (err) {
     // 错误处理
-    console.error("Getting survey list error",err);
-    next(err); 
+    console.error("Getting survey list error", err);
+    next(err);
   }
 });
 
-
-router.get("/result/:id",requireAuth, (req, res) => {
+router.get("/result/:id", requireAuth, (req, res) => {
   // 将动态 id 存储在会话中
   req.session.surveyId = req.params.id;
-  res.render('page/results', { username: req.user ? req.user.username : "" });
+  res.render("page/results", { username: req.user ? req.user.username : "" });
 });
 
-router.get('/api/answers', requireAuth, async (req, res, next) => {
+router.get("/api/answers", requireAuth, async (req, res, next) => {
   try {
     const surveyId = req.session.surveyId; // 从会话中获取动态 id 参数
 
     // 确保动态 id 参数已设置
     if (!surveyId) {
-      return res.status(400).json({ message: 'Survey ID not provided' });
+      return res.status(400).json({ message: "Survey ID not provided" });
     }
 
     // 查找调查
-    const survey = await Survey.findById(surveyId).populate('questions');
+    const survey = await Survey.findById(surveyId).populate("questions");
 
     if (!survey) {
-        return res.status(404).json({ message: 'Survey not found' });
+      return res.status(404).json({ message: "Survey not found" });
     }
 
     // 检索多选题
-    const multipleChoiceQuestions = survey.questions.filter(question => question.qType === 'multiple_choice');
+    const multipleChoiceQuestions = survey.questions.filter(
+      (question) => question.qType === "multiple_choice"
+    );
     // 收集每个问题的答案
     const questionAnswers = {};
     for (const question of multipleChoiceQuestions) {
-        const answers = await Answer.find({ surveyId: surveyId, questionId: question._id });
-        questionAnswers[question._id] = answers.map(answer => answer.answer);
+      const answers = await Answer.find({
+        surveyId: surveyId,
+        questionId: question._id,
+      });
+      questionAnswers[question._id] = answers.map((answer) => answer.answer);
     }
 
     // 将过滤出的问题也发送到前端页面
-    const filteredQuestions = multipleChoiceQuestions.map(question => ({
-        _id: question._id,
-        text: question.qText,
-        options: question.options
+    const filteredQuestions = multipleChoiceQuestions.map((question) => ({
+      _id: question._id,
+      text: question.qText,
+      options: question.options,
     }));
     // 渲染视图并传递数据
-    res.json({ questionAnswers: questionAnswers, questions: filteredQuestions, username: req.user ? req.user.username : "", id: surveyId });
-
+    res.json({
+      questionAnswers: questionAnswers,
+      questions: filteredQuestions,
+      username: req.user ? req.user.username : "",
+      id: surveyId,
+    });
   } catch (err) {
-    console.error("API Getting survey list error",err);
-    next(err); 
+    console.error("API Getting survey list error", err);
+    next(err);
   }
 });
-
 
 // 管理调查问卷
 router.get("/manage", requireAuth, async (req, res, next) => {
@@ -227,14 +240,14 @@ router.get("/manage", requireAuth, async (req, res, next) => {
     const surveyList = await Survey.find({ creator: req.user.id })
       .skip((page - 1) * perPage)
       .limit(perPage)
-      .populate('questions'); // populate问题列表
+      .populate("questions"); // populate问题列表
 
     // 获取总调查问卷数量
     const totalSurveys = await Survey.countDocuments({ creator: req.user.id });
 
     // 计算总页数
     const totalPages = Math.ceil(totalSurveys / perPage);
-    
+
     // 渲染页面并将调查问卷列表和分页信息传递给模板引擎
     res.render("page/manageList", {
       title: "Surveys",
@@ -245,14 +258,10 @@ router.get("/manage", requireAuth, async (req, res, next) => {
     });
   } catch (err) {
     // 错误处理
-    console.log("managing survey list error", err)
+    console.log("managing survey list error", err);
     next(err);
   }
 });
-
-
-
-
 
 // 获取单个调查问卷
 router.get("/take/:id", async (req, res, next) => {
@@ -278,7 +287,7 @@ router.get("/take/:id", async (req, res, next) => {
     });
   } catch (err) {
     console.error(err);
-    next(err); 
+    next(err);
   }
 });
 
@@ -312,8 +321,8 @@ router.post("/take/:id", async (req, res, next) => {
     await Answer.insertMany(newAnswers);
     res.redirect("/survey/list");
   } catch (err) {
-    console.error("Updating survey, getting survey list error",err);
-    next(err); 
+    console.error("Updating survey, getting survey list error", err);
+    next(err);
   }
 });
 
@@ -342,20 +351,19 @@ router.get("/delete/:id", requireAuth, async (req, res, next) => {
     res.redirect("/survey/manage");
   } catch (err) {
     console.error(err);
-    next(err); 
+    next(err);
   }
 });
 
 // 错误处理中间件
 router.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send("Internal Server Error");
+  res.render("error", { message: err });
 });
 
 // 404 错误处理中间件
 router.use((req, res) => {
-  res.status(404).send("Not Found");
+  res.render("error", { message: "Not Found" });
 });
-
 
 module.exports = router;
