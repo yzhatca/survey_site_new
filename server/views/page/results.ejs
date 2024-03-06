@@ -1,95 +1,98 @@
 <%- include ../partials/header.ejs %>
 
-<%- include ../partials/main_nav.ejs %>
-<br>
-<div class="container">
-    <h1>Survey Result</h1>
-    <br>
-    <div id="surveyResults" class="card-deck"></div>
-</div>
+    <%- include ../partials/main_nav.ejs %>
+        <br>
+        <div class="container">
+            <h1>Survey Result</h1>
+            <br>
+            <div id="surveyResults" class="card-deck"></div>
+        </div>
 
-<%- include ../partials/footer.ejs %>
+        <%- include ../partials/footer.ejs %>
 
-<!-- Include Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <!-- Include Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
-    // Use Fetch API to get data
-    fetch('/survey/api/answers')
-        .then(response => response.json())
-        .then(data => {
-            // Render data to the page
-            renderSurveyResults(data);
-            // Render pie charts
-            renderPieCharts(data);
-        })
-        .catch(error => console.error('Error fetching survey data:', error));
+            <!-- Include Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    // Function to render survey results to the page
-    function renderSurveyResults(data) {
-        const surveyResultsContainer = document.getElementById('surveyResults');
+            <script>
+                // Use Fetch API to get data
+                fetch('/survey/api/answers')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Render data to the page
+                        renderSurveyResults(data);
+                        // Render pie charts
+                        renderPieCharts(data);
+                    })
+                    .catch(error => console.error('Error fetching survey data:', error));
 
-        // Render questions
-        data.questions.forEach(question => {
-            const questionElement = document.createElement('div');
-            questionElement.classList.add('custom-card', 'text-center', 'mb-4', 'd-flex', 'justify-content-center', 'align-items-center');
-            questionElement.innerHTML = `
+                // Function to render survey results to the page
+                function renderSurveyResults(data) {
+                    const surveyResultsContainer = document.getElementById('surveyResults');
+
+                    // Render questions
+                    data.questions.forEach((question, index) => {
+                        const questionElement = document.createElement('div');
+                        questionElement.classList.add('custom-card', 'text-center', 'mb-4', 'd-flex', 'justify-content-center', 'align-items-center');
+                        questionElement.innerHTML = `
                 <div class="card-body">
                     <h5 class="card-title">Question:${question.text}</h5>
-                    <canvas id="chart-${question._id}" width="400" height="400"></canvas>
+                    <canvas id="chart-${question._id}" width="300" height="300"></canvas>
                 </div>
             `;
-            surveyResultsContainer.appendChild(questionElement);
-        });
-    }
-
-    // Function to render pie charts
-    function renderPieCharts(data) {
-        // Render pie chart for each question
-        data.questions.forEach(question => {
-            // Get the array of answers corresponding to the question
-            const answers = data.questionAnswers[question._id];
-
-            // Count the number of each answer
-            const answerCounts = {};
-            answers.forEach(answer => {
-                answerCounts[answer] = (answerCounts[answer] || 0) + 1;
-            });
-
-            // Calculate percentages
-            const totalAnswers = answers.length;
-            const percentages = {};
-            Object.keys(answerCounts).forEach(answer => {
-                percentages[answer] = (answerCounts[answer] / totalAnswers) * 100;
-            });
-
-            // Prepare labels and data
-            const labels = Object.keys(percentages);
-            const dataValues = Object.values(percentages);
-
-            // Create pie chart
-            new Chart(`chart-${question._id}`, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: dataValues,
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.7)',
-                            'rgba(54, 162, 235, 0.7)',
-                            'rgba(255, 206, 86, 0.7)',
-                            'rgba(75, 102, 192, 0.7)',
-                            'rgba(153, 102, 255, 0.7)',
-                            'rgba(155, 159, 64, 0.7)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: false, // Disable responsiveness
-                    maintainAspectRatio: false, // Disable maintaining aspect ratio
+                        surveyResultsContainer.appendChild(questionElement);
+                    });
                 }
-            });
-        });
-    }
-</script>
+
+                // Function to render pie charts
+                function renderPieCharts(data) {
+                    // Render pie chart for each question
+                    data.questions.forEach(question => {
+                        // Get the array of answers corresponding to the question
+                        const answers = data.questionAnswers[question._id];
+
+                        // Count the number of each answer
+                        const answerCounts = {};
+                        answers.forEach(answer => {
+                            answerCounts[answer] = (answerCounts[answer] || 0) + 1;
+                        });
+
+                        // Calculate percentages and prepare labels and data
+                        const totalAnswers = answers.length;
+                        const labels = [];
+                        const dataValues = [];
+                        Object.keys(answerCounts).forEach(answer => {
+                            const count = answerCounts[answer];
+                            const percentage = (count / totalAnswers) * 100;
+                            labels.push(`${answer} (${count})`); // Add count and percentage to label
+                            dataValues.push(percentage.toFixed(2));
+                        });
+
+                        // Create pie chart
+                        new Chart(`chart-${question._id}`, {
+                            type: 'pie',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    data: dataValues,
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.7)',
+                                        'rgba(54, 162, 235, 0.7)',
+                                        'rgba(255, 206, 86, 0.7)',
+                                        'rgba(75, 102, 192, 0.7)',
+                                        'rgba(153, 102, 255, 0.7)',
+                                        'rgba(155, 159, 64, 0.7)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: false, // Disable responsiveness
+                                maintainAspectRatio: false, // Disable maintaining aspect ratio
+                            }
+                        });
+                    });
+                }
+            </script>
