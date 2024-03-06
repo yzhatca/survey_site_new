@@ -249,7 +249,7 @@ router.get("/manage", requireAuth, async (req, res, next) => {
     const totalPages = Math.ceil(totalSurveys / perPage);
 
     // 渲染页面并将调查问卷列表和分页信息传递给模板引擎
-    res.render("page/manageList", {
+    res.render("page/managelist", {
       title: "Surveys",
       username: req.user.username,
       SurveyList: surveyList,
