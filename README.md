@@ -38,3 +38,6 @@ This is a web application for creating, managing, taking, and visualizing survey
 
 Contributions are welcome! Fork the repository, make changes, and submit pull requests.
 
+## Visiting
+
+This site can be visited through:https://surveysitenew-production.up.railway.app/
