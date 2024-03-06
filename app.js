@@ -1,12 +1,16 @@
 // 引入需要的模块
+require('dotenv').config();
 var createError = require('http-errors'); // 用于创建 HTTP 错误对象的模块
 var express = require('express'); // Express 框架
 var path = require('path'); // Node.js 提供的路径处理模块
 var cookieParser = require('cookie-parser'); // 解析 Cookie 的中间件
 var logger = require('morgan'); // 日志记录中间件
 const bodyParser = require('body-parser');
-let DB = require('./server/config/db'); // 引入数据库配置文件
+let DB = process.env.URI
 var app = express(); // 创建 Express 应用程序实例
+// CORS 设置：在 Express 中使用 cors 中间件
+var cors = require('cors');
+
 
 
 // 引入 Passport 和 JWT
@@ -43,10 +47,11 @@ app.use(express.static(path.join(__dirname, 'public'))); // 设置静态文件�
 app.use(express.static(path.join(__dirname, 'node_modules')));
 app.use('/server', express.static('server'));
 app.use(bodyParser.urlencoded({ extended: true }));
-
+// 允许来自所有域的请求
+app.use(cors());
 // 使用 express-session 中间件来管理会话
 app.use(session({
-  secret: 'mySecret', // 用于对 session 数据进行加密的密钥，可以是任意字符串
+  secret: process.env.Secret, // 用于对 session 数据进行加密的密钥，可以是任意字符串
   resave: false, // 是否每次请求都重新保存 session 数据，默认为 true
   saveUninitialized: false, // 是否自动保存未初始化的 session 数据，默认为 true
 }))
@@ -103,7 +108,7 @@ let mongoose = require('mongoose'); // 引入 Mongoose 模块
 
 // 将 Mongoose 指向数据库 URI
 // 通过 Mongoose 连接到本地 MongoDB 数据库
-mongoose.connect(DB.URI)
+mongoose.connect(DB)
     .then(() => {
         console.log('MongoDB connection success');
     })
