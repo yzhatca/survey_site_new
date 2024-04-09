@@ -1,18 +1,19 @@
 /* This code snippet is a JavaScript file that defines a user schema using Mongoose, a popular Node.js
 library for MongoDB. Here's a breakdown of what each part of the code does: */
-// 引入所需的模块
+
+// Import required modules
 let mongoose = require("mongoose");
 
-// 定义用户模式
+// Define user schema
 let userSchema = new mongoose.Schema({
-// 用户名, 允许重复
-    password: { type: String, required: true }, // 密码
-    email: { type: String, required: true, unique: true }, // 邮箱
-    username: { type: String }, 
-    displayName: { type: String }, // 显示名
-    userType: { type: String }, // 用户类型
-    created: { type: Date, default: Date.now } // 创建时间
+  // Username, allowed to be repeated
+  password: { type: String, required: true }, // Password
+  email: { type: String, required: true, unique: true }, // Email
+  username: { type: String }, // Username
+  displayName: { type: String }, // Display name
+  userType: { type: String }, // User type
+  created: { type: Date, default: Date.now }, // Creation time
 });
 
-// 创建用户模型
-module.exports = mongoose.model('User', userSchema);
+// Create user model
+module.exports = mongoose.model("User", userSchema);

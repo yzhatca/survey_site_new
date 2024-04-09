@@ -1,76 +1,70 @@
 <div style="height: 20px;">
-    <%- include ../partials/header.ejs %>
+  <%- include ../partials/header.ejs %>
 
-        <%- include ../partials/main_nav.ejs %>
+  <%- include ../partials/main_nav.ejs %>
 </div>
 <div class="container justify-content-center">
-    <div class="row">
-        <div class="offset-md-3 col-md-6">
-            <h1 class="text-center">Edit Survey</h1>
-            <form id="surveyForm" method="POST">
-                <div class="form-group mb-3">
-                    <label for="surveyTitle">Survey Title</label>
-                    <input type="text" class="form-control" id="surveyTitle" placeholder="Enter Survey Title"
-                        name="title" required value="<%= survey.title %>">
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="description">Survey Description</label>
-                    <textarea cols="50" id="description" class="form-control" placeholder="Enter Survey Description"
-                        name="description" required><%= survey.description %></textarea>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="endDate">End Date</label>
-                    <input type="date" id="endDate" class="form-control" name="endTime" required value="<%= survey.endTime.toISOString().split('T')[0] %>">
-                </div>
-
-                <div class="question-fields form-group mb-3" hidden="true">
-                    <label for="questionType">Question Type</label>
-                    <select name="questionType" id="questionType" class="form-control">
-                        <option value="<%= survey.questions[0].qType %>">
-                            <%= survey.questions[0].qType %>
-                        </option>
-                    </select>
-                </div>
-
-                <div id="questionFields" class="form-group mb-3">
-                    <% survey.questions.forEach((question, index)=> { %>
-                        <div class="questionField" data-question-type="<%= question.qType %>"
-                            data-question-id="<%= question._id%>">
-                            <label for="question<%= index %>Text">Question <%= index + 1 %></label>
-                            <% if (question.qType==='multiple_choice' ) { %>
-                                <!-- 生成多选题 -->
-                                <input type="text" id="question<%= index %>Text" required value="<%= question.qText %>"
-                                    class="form-control" placeholder="Enter Question Description">
-                                <% question.options.forEach((option, optIndex)=> { %>
-                                    <div class="choicesContainer">
-                                        <label>Option <%= optIndex+1 %>:</label>
-                                        <input type="text" class="choiceText custom-input" required
-                                            value="<%= option %>" class="form-control custom-input">
-                                        <button type="button" class="removeChoice btn btn-danger">-</button>
-                                    </div>
-                                    <% }) %>
-                                        <button type="button" class="addChoice btn btn-primary">Add Choice</button>
-                                        <% } else if (question.qType==='short_answers' ) { %>
-                                            <!-- 生成简答题 -->
-                                            <textarea id="question<%= index %>Text" required
-                                                class="form-control"><%= question.qText %></textarea>
-                                            <% } %>
-                                                <input type="hidden" value="<%= question._id %>">
-                                                <input type="hidden" value="<%= question.qType %>">
-                                                <button type="button" class="deleteQuestion btn btn-danger">Delete
-                                                    Question</button>
-                        </div>
-                        <% }) %>
-                </div>
-
-                <button type="button" id="addQuestion" class="btn btn-primary">Add Question</button>
-                <button type="submit" class="btn btn-primary">Update</button>
-            </form>
+  <div class="row">
+    <div class="offset-md-3 col-md-6">
+      <h1 class="text-center">Edit Survey</h1>
+      <form id="surveyForm" method="POST">
+        <div class="form-group mb-3">
+          <label for="surveyTitle">Survey Title</label>
+          <input type="text" class="form-control" id="surveyTitle" placeholder="Enter Survey Title" name="title" required value="<%= survey.title %>">
         </div>
+
+        <div class="form-group mb-3">
+          <label for="description">Survey Description</label>
+          <textarea cols="50" id="description" class="form-control" placeholder="Enter Survey Description" name="description" required><%= survey.description %></textarea>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="endDate">End Date</label>
+          <input type="date" id="endDate" class="form-control" name="endTime" required value="<%= survey.endTime.toISOString().split('T')[0] %>">
+        </div>
+
+        <div class="question-fields form-group mb-3" hidden="true">
+          <label for="questionType">Question Type</label>
+          <select name="questionType" id="questionType" class="form-control">
+            <option value="<%= survey.questions[0].qType %>">
+              <%= survey.questions[0].qType %>
+            </option>
+          </select>
+        </div>
+
+        <div id="questionFields" class="form-group mb-3">
+          <% survey.questions.forEach((question, index)=> { %>
+          <div class="questionField" data-question-type="<%= question.qType %>" data-question-id="<%= question._id%>">
+            <label for="question<%= index %>Text">Question <%= index + 1 %></label>
+            <% if (question.qType==='multiple_choice' ) { %>
+            <!-- 生成多选题 -->
+            <input type="text" id="question<%= index %>Text" required value="<%= question.qText %>" class="form-control" placeholder="Enter Question Description">
+            <% question.options.forEach((option, optIndex)=> { %>
+            <div class="choicesContainer">
+              <label>Option <%= optIndex+1 %>:</label>
+              <input type="text" class="choiceText custom-input" required value="<%= option %>" class="form-control custom-input">
+              <button type="button" class="removeChoice btn btn-danger">-</button>
+            </div>
+            <% }) %>
+            <button type="button" class="addChoice btn btn-primary">Add Choice</button>
+            <% } else if (question.qType==='short_answers' ) { %>
+            <!-- 生成简答题 -->
+            <textarea id="question<%= index %>Text" required class="form-control"><%= question.qText %></textarea>
+            <% } %>
+            <input type="hidden" value="<%= question._id %>">
+            <input type="hidden" value="<%= question.qType %>">
+            <button type="button" class="deleteQuestion btn btn-danger">Delete
+              Question</button>
+          </div>
+          <% }) %>
+        </div>
+
+        <button type="button" id="addQuestion" class="btn btn-primary">Add Question</button>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </form>
     </div>
+  </div>
 </div>
 <%- include ../partials/footer.ejs %>
-    <script src="/server/views/scripts/editQuestion.js">   
-    </script>
+<script src="/server/views/scripts/editQuestion.js">
+</script>

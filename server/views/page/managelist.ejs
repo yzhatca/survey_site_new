@@ -1,77 +1,73 @@
 <%- include ../partials/header.ejs %>
 
-    <%- include ../partials/main_nav.ejs %>
-        <main class="container mt-5 mb-3">
-            <div class="row">
-                <div class="offset-md-1 col-md-10">
-                    <h1 class="text-center">Surveys</h1>
-                    <a href="/survey/add" class="btn btn-primary" role="button">
-                        <i class="fas fa-plus-circle"></i> Create a Survey </a>
-                    <br>
-                    <table class="table table-bordered table-striped table-hover">
-                        <!-- Header Row -->
-                        <tr>
-                            <th class="text-center col-2">Survey Name</th>
-                            <th class="text-center col-2">Description</th>
-                            <th class="text-center col-2">End Date</th>
-                            <th class="text-center col-1">EDIT Survey</th>
-                            <th class="text-center col-1">DELETE Survey</th>
-                            <th class="text-center col-1">See Result</th>
-                        </tr>
+<%- include ../partials/main_nav.ejs %>
+<main class="container mt-5 mb-3">
+  <div class="row">
+    <div class="offset-md-1 col-md-10">
+      <h1 class="text-center">Surveys</h1>
+      <a href="/survey/add" class="btn btn-primary" role="button">
+        <i class="fas fa-plus-circle"></i> Create a Survey </a>
+      <br>
+      <table class="table table-bordered table-striped table-hover">
+        <!-- Header Row -->
+        <tr>
+          <th class="text-center col-2">Survey Name</th>
+          <th class="text-center col-2">Description</th>
+          <th class="text-center col-2">End Date</th>
+          <th class="text-center col-1">EDIT Survey</th>
+          <th class="text-center col-1">DELETE Survey</th>
+          <th class="text-center col-1">See Result</th>
+        </tr>
 
-                        <!-- Repeatable Template Row -->
-                        <% for(let item of SurveyList) { %>
-                            <tr>
-                                <td class="text-center">
-                                    <%= item.title %>
-                                </td>
-                                <td class="text-center">
-                                    <%= item.description %>
-                                </td>
-                                <td class="text-center">
-                                    <%= item.endTime.toISOString().split('T')[0] %>
-                                </td>
-                                <td class="text-center">
-                                    <a href="/survey/update/<%= item._id %>" class="btn-primary btn-sm">
-                                        <i class="bi bi-check-square"></i>EDIT</a>
-                                </td>
-                                <td class="text-center">
-                                    <a href="/survey/delete/<%= item._id %>"
-                                        onclick="return confirm('Are you sure you want to delete?')"
-                                        class="btn-danger btn-sm">
-                                        <i class="bi bi-check-square"></i>DELETE</a>
-                                </td>
-                                <td class="text-center">
-                                    <% if (item.questions.some(q => q.qType === 'short_answers')) { %>
-                                        <!-- Check if any question in the survey is short_answers -->
-                                        N/A
-                                    <% } else { %>
-                                        <a href="/survey/result/<%= item._id %>" class="btn-primary btn-sm">
-                                            <i class="bi bi-check-square"></i>Check</a>
-                                    <% } %>
-                                </td>
-                            </tr>
-                            <% } %>
-                    </table>
+        <!-- Repeatable Template Row -->
+        <% for(let item of SurveyList) { %>
+        <tr>
+          <td class="text-center">
+            <%= item.title %>
+          </td>
+          <td class="text-center">
+            <%= item.description %>
+          </td>
+          <td class="text-center">
+            <%= item.endTime.toISOString().split('T')[0] %>
+          </td>
+          <td class="text-center">
+            <a href="/survey/update/<%= item._id %>" class="btn-primary btn-sm">
+              <i class="bi bi-check-square"></i>EDIT</a>
+          </td>
+          <td class="text-center">
+            <a href="/survey/delete/<%= item._id %>" onclick="return confirm('Are you sure you want to delete?')" class="btn-danger btn-sm">
+              <i class="bi bi-check-square"></i>DELETE</a>
+          </td>
+          <td class="text-center">
+            <% if (item.questions.some(q => q.qType === 'short_answers')) { %>
+            <!-- Check if any question in the survey is short_answers -->
+            N/A
+            <% } else { %>
+            <a href="/survey/result/<%= item._id %>" class="btn-primary btn-sm">
+              <i class="bi bi-check-square"></i>Check</a>
+            <% } %>
+          </td>
+        </tr>
+        <% } %>
+      </table>
 
-                    <!-- Pagination Controls -->
-                    <div>
-                        <% if(currentPage> 1) { %>
-                            <a href="/survey/list?page=<%= currentPage - 1 %>" class="btn-primary btn-sm">Prev</a>
-                            <% } %>
-                                Page <%= currentPage %> of <%= totalPages %>
-                                        <% if(currentPage < totalPages) { %>
-                                            <a href="/survey/list?page=<%= currentPage + 1 %>"
-                                                class="btn-primary btn-sm">Next</a>
-                                            <% } %>
-                                                <!-- Allow users to input page number -->
-                                                <form action="/survey/list" method="get" style="display: inline-block;">
-                                                    <input type="number" name="page" min="1" max="<%= totalPages %>"
-                                                        class="form-range">
-                                                    <button type="submit" class="btn-primary">Go</button>
-                                                </form>
-                    </div>
-                </div>
-            </div>
-        </main>
-        <%- include ../partials/footer.ejs %>
+      <!-- Pagination Controls -->
+      <div>
+        <% if(currentPage> 1) { %>
+        <a href="/survey/manage?page=<%= currentPage - 1 %>" class="btn-primary btn-sm">Prev</a>
+        <% } %>
+        Page <%= currentPage %> of <%= totalPages %>
+        <% if(currentPage < totalPages) { %>
+        <a href="/survey/manage?page=<%= currentPage + 1 %>" class="btn-primary btn-sm">Next</a>
+        <% } %>
+        <!-- Allow users to input page number -->
+        <form action="/survey/manage" method="get" style="display: inline-block;">
+          <input type="number" name="page" min="1" max="<%= totalPages %>" class="form-range">
+          <button type="submit" class="btn-primary">Go</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+<%- include ../partials/footer.ejs %>

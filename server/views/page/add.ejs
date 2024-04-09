@@ -1,50 +1,48 @@
     <div style="height: 20px;">
-        <%- include ../partials/header.ejs %>
+      <%- include ../partials/header.ejs %>
 
-            <%- include ../partials/main_nav.ejs %>
+      <%- include ../partials/main_nav.ejs %>
     </div>
 
     <div class="container justify-content-center">
-        <div class="row">
-            <div class="offset-md-3 col-md-6">
-                <h1 class="text-center">Create Survey</h1>
-                <form id="surveyForm" method="POST">
-                    <div class="form-group mb-3">
-                        <label for="surveyTitle">Survey Title</label>
-                        <input type="text" class="form-control" id="surveyTitle" placeholder="Enter Survey Title"
-                            name="title" required>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="description">Survey Description</label>
-                        <textarea cols="50" class="form-control" id="description" placeholder="Enter Survey Description"
-                            name="description" required></textarea>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="endDate">End Date</label>
-                        <input type="date" class="form-control" id="endDate" name="endTime" required>
-                    </div>
-
-                    <div class="question-fields form-group mb-3">
-                        <label for="questionType">Question Type</label>
-                        <select name="questionType" class="form-control custom-select" id="questionType">
-                            <option value="">Select Question Type</option>
-                            <option value="multiple_choice">Multiple Choice</option>
-                            <option value="short_answers">Short Answers</option>
-                        </select>
-                    </div>
-
-                    <div id="questionFields" class="form-group mb-3">
-                        <!-- Question fields will be dynamically generated here -->
-                    </div>
-
-                    <button type="button" id="addQuestion" class="btn btn-primary">Add Question</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+      <div class="row">
+        <div class="offset-md-3 col-md-6">
+          <h1 class="text-center">Create Survey</h1>
+          <form id="surveyForm" method="POST">
+            <div class="form-group mb-3">
+              <label for="surveyTitle">Survey Title</label>
+              <input type="text" class="form-control" id="surveyTitle" placeholder="Enter Survey Title" name="title" required>
             </div>
-        </div>
-    </div>
-</body>
 
-<script src="/server/views/scripts/addQuestion.js"></script>
+            <div class="form-group mb-3">
+              <label for="description">Survey Description</label>
+              <textarea cols="50" class="form-control" id="description" placeholder="Enter Survey Description" name="description" required></textarea>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="endDate">End Date</label>
+              <input type="date" class="form-control" id="endDate" name="endTime" required>
+            </div>
+
+            <div class="question-fields form-group mb-3">
+              <label for="questionType">Question Type</label>
+              <select name="questionType" class="form-control custom-select" id="questionType">
+                <option value="">Select Question Type</option>
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="short_answers">Short Answers</option>
+              </select>
+            </div>
+
+            <div id="questionFields" class="form-group mb-3">
+              <!-- Question fields will be dynamically generated here -->
+            </div>
+
+            <button type="button" id="addQuestion" class="btn btn-primary">Add Question</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    </body>
+
+    <script src="/server/views/scripts/addQuestion.js"></script>
