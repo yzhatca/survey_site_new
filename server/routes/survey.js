@@ -142,7 +142,7 @@ router.post("/update/:id", requireAuth, async (req, res, next) => {
 router.get("/list", async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const perPage = 6;
+    const perPage = 5;
     const surveyList = await Survey.find()
       .skip((page - 1) * perPage)
       .limit(perPage);
