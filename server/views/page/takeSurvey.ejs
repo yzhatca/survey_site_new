@@ -1,33 +1,34 @@
 <div style="height: 20px;">
-    <%- include ../partials/header.ejs %>
+  <%- include ../partials/header.ejs %>
 
-    <%- include ../partials/main_nav.ejs %>
+  <%- include ../partials/main_nav.ejs %>
 </div>
 <div class="container justify-content-center">
-    <div class="row">
-        <div class="offset-md-3 col-md-6">
-    <h1 class="text-center"><%= survey.title %></h1>
-    <!-- Submit to default route -->
-    <form method="post">
+  <div class="row">
+    <div class="offset-md-3 col-md-6">
+      <h1 class="text-center"><%= survey.title %></h1>
+      <!-- Submit to default route -->
+      <form method="post">
         <% const questions = survey.questions %>
         <% let questionNum = 1 %>
         <% for (let item of questions) { %>
-            <div class="form-group mb-3">
-                <label>Question <%= questionNum++ %>:</label>
-                <div class="form-group mb-3"><%= item.qText %></div>
-                <% if (item.qType === 'short_answers') { %>
-                    <input type="text" name="<%= item._id %>" placeholder="Your answer" class="form-control" required>
-                <% } else if (item.qType === 'multiple_choice') { %>
-                    <% let optionNum = 1 %>
-                    <% for(let option of item.options) { %>
-                        <input type="radio" id="<%= option %>" name="<%= item._id %>" value="<%= option %>" required>
-                        <label for="<%= option %>"><%= option %></label><br>
-                    <% } %>
-                <% } %>
-            </div>
+        <div class="form-group mb-3">
+          <label>Question <%= questionNum++ %>:</label>
+          <div class="form-group mb-3"><%= item.qText %></div>
+          <% if (item.qType === 'short_answers') { %>
+          <input type="text" name="<%= item._id %>" placeholder="Your answer" class="form-control" required>
+          <% } else if (item.qType === 'multiple_choice') { %>
+          <% let optionNum = 1 %>
+          <% for(let option of item.options) { %>
+          <input type="radio" id="<%= option %>" name="<%= item._id %>" value="<%= option %>" required>
+          <label for="<%= option %>"><%= option %></label><br>
+          <% } %>
+          <% } %>
+        </div>
         <% } %>
         <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</div>
+        <a href="javascript:history.go(-1);" class="btn btn-warning">Cancel</a>
+      </form>
+    </div>
 
-<%- include ../partials/footer.ejs %>
+    <%- include ../partials/footer.ejs %>
